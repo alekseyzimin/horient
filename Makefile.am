@@ -1,4 +1,4 @@
-AM_CXXFLAGS = -Wall -Werror -g -O2 -I$(top_srcdir)/src
+AM_CXXFLAGS = -Wall -Werror -g -O0 -I$(top_srcdir)/src -I/software/Linux64/include -std=c++0x
 
 # Yaggo variable
 noinst_HEADERS = $(YAGGO_SOURCES)
@@ -16,10 +16,10 @@ YAGGO_SOURCES = # Append all file to be built by yaggo
 ##############################
 # Programs
 ##############################
-bin_PROGRAMS = test
-test_SOURCES = src/test.cc
-noinst_HEADERS += src/test.hpp
-YAGGO_SOURCES += src/test_cmdline.hpp
+bin_PROGRAMS = gen_orient
+
+gen_orient_SOURCES = src/gen_orient.cpp
+noinst_HEADERS += src/gen_orient.h
 
 ##############################
 # Unit tests
