@@ -28,19 +28,18 @@ struct disjoint_set {
 };
 
 template<typename T>
-void union_set(disjoint_set<T>& x, disjoint_set<T>& y) {
+typename disjoint_set<T>::set_type union_set(disjoint_set<T>& x, disjoint_set<T>& y) {
   typedef typename disjoint_set<T>::set_type set_type;
   set_type xRoot = x.find();
-  set_type yRoot = y.find();
-
+  set_type yRoot = y.find()
+;
   if(xRoot == yRoot)
-    return;
+    return xRoot;
   if(xRoot->rank < yRoot->rank) {
-    xRoot->parent  = yRoot;
-  } else {
-    yRoot->parent  = xRoot;
-    xRoot->rank   += (xRoot->rank == yRoot->rank);
+    return xRoot->parent  = yRoot;
   }
+  xRoot->rank   += (xRoot->rank == yRoot->rank);
+  return yRoot->parent  = xRoot;
 }
 
 template<typename T>

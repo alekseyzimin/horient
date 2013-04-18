@@ -30,4 +30,4 @@ all_tests_CXXFLAGS = $(AM_CXXFLAGS) -I$(top_srcdir)/unittests
 all_tests_LDFLAGS = -lpthread
 all_tests_SOURCES = unittests/gtest/gtest-all.cc unittests/gtest/gtest_main.cc unittests/gtest/gtest.h
 
-all_tests_SOURCES += unittests/test_disjoint_set.cc
+all_tests_SOURCES += unittests/test_disjoint_set.cc unittests/test_edge.cc
