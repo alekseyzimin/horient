@@ -1,69 +1,53 @@
-#include <edge_list.hpp>
-#include <list>
+#include <istream>
 #include <iostream>
+#include <string>
 
-typedef disjoint_set<int> node;
-typedef edge_base<node> edge;
+#include <horient.hpp>
+
 
 //Assumes fntally has been defined globally.
 //Assumes the tally-file is in a 6-column format
 //Requires access to the master edge & node lists.
-void readdata(list<edge>& master_edge, list<node>& master_node, bool filters){
-  ifstream tallyfile;
-  int node1,node2,wght1,wght2,wght3,wght4;
-  node* tmp_n0,tmp_n1;
-  edge* tmp_e;
-  list<edge>::const_iterator edge_it;
+void readdata(
+std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::istream& input) {
+  std::string node1, node2;
+  int         wght1,wght2,wght3,wght4;
+  int         id = 0;
 
-  tallyfile.open(fntally.c_string(),"r");
-  //If we didn't fail to open the file...
-  if(tallyfile.is_open())
-    {
-      //While we haven't hit the end of file.
-      while(tallyfile.good())
-	{
-	  //Read in the 6 values
-	  node1<<tallyfile;
-	  node2<<tallyfile;
-	  wght1<<tallyfile;
-	  wght2<<tallyfile;
-	  wght3<<tallyfile;
-	  wght4<<tallyfile;
+  //While we haven't hit the end of file.
+  while(input.good()) {
+    //Read in the 6 values
+    input >> node1 >> node2
+          >> wght1 >> wght2 >> wght3 >> wght4;
+    if(!input.good())
+      break;
 
-	  //If we are using filters, and none of the conditions are true... try storing it
-	  // Conditions are: 
-	  //                satisified Mate-pairs == unsatisfied mate-pairs
-	  //                only 1 mate-pair on edge
-	  //                OR not using filters...
-	  // Currently, if there is data in wght3/4 there will be problems with the filter.
-	  if( !filters ||
-	      (filters && 
-	       !( (wght3==0 && wght4==0) && 
-		  ( (wght1==1 && wght2==0) || (wght2==1 && wght1==0)|| (wght1==wght2) ) ) ) ) 
-	    {
-	      //Find (or create) pointers to the input nodes.
-	      tmp_n0=master_node.find(node1);
-	      tmp_n1=master_node.find(node2);
+    //If we are using filters, and none of the conditions are true... try storing it
+    // Conditions are:
+    //                satisified Mate-pairs == unsatisfied mate-pairs
+    //                only 1 mate-pair on edge
+    //                OR not using filters...
+    // Currently, if there is data in wght3/4 there will be problems with the filter.
+    if(filters && ( (wght1 == 1 && wght2 == 0) || (wght2 == 1 && wght1 == 0) || (wght1 == wght2) ) )
+      continue;
 
-	      //Zero out single 'bad' mate-pairs (if there is data in other entry)
-	      if(filters && wght1==1 && wght2>1){wght1=0;}
-	      if(filters && wght2==1 && wght1>1){wght2=0;}
+    //Find (or create) pointers to the input nodes.
+    node& tmp_n0 = master_node[node1];
+    node& tmp_n1 = master_node[node2];
+    if(tmp_n0->id < 0)
+      tmp_n0->id = id++;
+    if(tmp_n1->id < 0)
+      tmp_n1->id = id++;
 
-	      //Make a new edge
-	      tmp_e=new edge(tmp_n0,tmp_n1,wght1,wght2);
-	      
-	      //Add the edge to the master list, and each node;
-	      edge_it=master_edge.addedge(tmp_e);
+    //Zero out single 'bad' mate-pairs (if there is data in other entry)
+    if(filters && wght1==1 && wght2>1) { wght1=0; }
+    if(filters && wght2==1 && wght1>1) { wght2=0; }
 
-	      //Use the returned iterator to add in nodes
-	      (*tmp_n0).addedge(edge_it);
-	      (*tmp_n1).addedge(edge_it);
-	    }
+    //Make a new edge
+    master_edge.push_front(edge(&tmp_n0, &tmp_n1, wght1, wght2));
 
-	}
-    }
-  //If we failed to open the file, output error and exit.
-  else{cout<<"Error in opening tally file"<<endl;exit(EXIT_FAILURE)}
-  
-  tallyfile.close();
+    //Use the returned iterator to add in nodes
+    tmp_n0->add_edge(master_edge.begin());
+    tmp_n1->add_edge(master_edge.begin());
+  }
 }

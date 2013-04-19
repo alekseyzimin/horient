@@ -20,6 +20,11 @@ struct disjoint_set {
   explicit disjoint_set(const T& v) : parent(this), rank(0), value(v) { }
   explicit disjoint_set(T&& v) : parent(this), rank(0), value(std::move(v)) { }
 
+  reference operator*() { return value; }
+  const_reference operator*() const { return value; }
+  pointer operator->() { return &value; }
+  const_pointer operator->() const { return &value; }
+
   set_type find() {
     if(parent != this)
       parent = parent->find();
