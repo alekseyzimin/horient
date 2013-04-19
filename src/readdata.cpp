@@ -1,9 +1,16 @@
 #include <istream>
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include <horient.hpp>
 
+node& insert_node(std::string label, node_map_type& master_node, int& id) {
+  auto it = master_node.find(label);
+  if(it != master_node.end())
+    return it->second;
+  return master_node.insert(std::make_pair(label, node(id++))).first->second;
+}
 
 //Assumes fntally has been defined globally.
 //Assumes the tally-file is in a 6-column format
@@ -32,12 +39,8 @@ std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::ist
       continue;
 
     //Find (or create) pointers to the input nodes.
-    node& tmp_n0 = master_node[node1];
-    node& tmp_n1 = master_node[node2];
-    if(tmp_n0->id < 0)
-      tmp_n0->id = id++;
-    if(tmp_n1->id < 0)
-      tmp_n1->id = id++;
+    node& tmp_n0 = insert_node(node1, master_node, id);
+    node& tmp_n1 = insert_node(node2, master_node, id);
 
     //Zero out single 'bad' mate-pairs (if there is data in other entry)
     if(filters && wght1==1 && wght2>1) { wght1=0; }

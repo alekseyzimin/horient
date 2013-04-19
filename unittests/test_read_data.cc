@@ -23,46 +23,90 @@ TEST(ReadData, Small) {
   readdata(master_edge, master_node, true, input);
 
   EXPECT_EQ((size_t)5, master_node.size());
-  for(auto it = master_node.cbegin(); it != master_node.cend(); ++it) {
+  for(auto it = master_node.cbegin(); it != master_node.cend(); ++it)
     EXPECT_EQ(std::stoi(it->first), it->second->id);
+
+  {
+    auto it = master_edge.cbegin();
+    EXPECT_NE(it, master_edge.cend());
+    EXPECT_EQ(3, (*it->n1)->id);
+    EXPECT_EQ(4, (*it->n2)->id);
+    EXPECT_EQ(5, it->good);
+    EXPECT_EQ(0, it->bad);
+
+    ++it;
+    EXPECT_NE(it, master_edge.cend());
+    EXPECT_EQ(1, (*it->n1)->id);
+    EXPECT_EQ(4, (*it->n2)->id);
+    EXPECT_EQ(0, it->good);
+    EXPECT_EQ(8, it->bad);
+
+    ++it;
+    EXPECT_NE(it, master_edge.cend());
+    EXPECT_EQ(1, (*it->n1)->id);
+    EXPECT_EQ(3, (*it->n2)->id);
+    EXPECT_EQ(0, it->good);
+    EXPECT_EQ(6, it->bad);
+
+    ++it;
+    EXPECT_NE(it, master_edge.cend());
+    EXPECT_EQ(1, (*it->n1)->id);
+    EXPECT_EQ(2, (*it->n2)->id);
+    EXPECT_EQ(4, it->good);
+    EXPECT_EQ(0, it->bad);
+
+    ++it;
+    EXPECT_NE(it, master_edge.cend());
+    EXPECT_EQ(0, (*it->n1)->id);
+    EXPECT_EQ(1, (*it->n2)->id);
+    EXPECT_EQ(7, it->good);
+    EXPECT_EQ(0, it->bad);
+
+    ++it;
+    EXPECT_EQ(master_edge.cend(), it);
   }
 
-  auto it = master_edge.cbegin();
-  EXPECT_NE(it, master_edge.cend());
-  EXPECT_EQ(3, (*it->n1)->id);
-  EXPECT_EQ(4, (*it->n2)->id);
-  EXPECT_EQ(5, it->good);
-  EXPECT_EQ(0, it->bad);
+  {
+    auto it = master_node.find("0");
+    EXPECT_NE(master_node.end(), it);
+    auto edges = it->second->edges.local_list;
+    EXPECT_EQ((size_t)1, edges.size());
+    auto first_edge = master_edge.begin();
+    std::advance(first_edge, 4);
+    EXPECT_EQ(*edges.begin(), first_edge);
+  }
 
-  ++it;
-  EXPECT_NE(it, master_edge.cend());
-  EXPECT_EQ(1, (*it->n1)->id);
-  EXPECT_EQ(4, (*it->n2)->id);
-  EXPECT_EQ(0, it->good);
-  EXPECT_EQ(8, it->bad);
+  {
+    auto it = master_node.find("1");
+    EXPECT_NE(master_node.end(), it);
+    auto edges = it->second->edges.local_list;
+    EXPECT_EQ((size_t)4, edges.size());
+    auto edge_it = edges.begin();
+    ASSERT_NE(edge_it, edges.end());
+    auto first_edge = master_edge.begin();
+    std::advance(first_edge, 4);
+    EXPECT_EQ(*edge_it, first_edge);
 
-  ++it;
-  EXPECT_NE(it, master_edge.cend());
-  EXPECT_EQ(1, (*it->n1)->id);
-  EXPECT_EQ(3, (*it->n2)->id);
-  EXPECT_EQ(0, it->good);
-  EXPECT_EQ(6, it->bad);
+    ++edge_it;
+    ASSERT_NE(edge_it, edges.end());
+    auto second_edge = master_edge.begin();
+    std::advance(second_edge, 3);
+    EXPECT_EQ(*edge_it, second_edge);
 
-  ++it;
-  EXPECT_NE(it, master_edge.cend());
-  EXPECT_EQ(1, (*it->n1)->id);
-  EXPECT_EQ(2, (*it->n2)->id);
-  EXPECT_EQ(4, it->good);
-  EXPECT_EQ(0, it->bad);
+    ++edge_it;
+    ASSERT_NE(edge_it, edges.end());
+    auto third_edge = master_edge.begin();
+    std::advance(third_edge, 2);
+    EXPECT_EQ(*edge_it, third_edge);
 
-  ++it;
-  EXPECT_NE(it, master_edge.cend());
-  EXPECT_EQ(0, (*it->n1)->id);
-  EXPECT_EQ(1, (*it->n2)->id);
-  EXPECT_EQ(7, it->good);
-  EXPECT_EQ(0, it->bad);
+    ++edge_it;
+    ASSERT_NE(edge_it, edges.end());
+    auto fourth_edge = master_edge.begin();
+    std::advance(fourth_edge, 1);
+    EXPECT_EQ(*edge_it, fourth_edge);
 
-  ++it;
-  EXPECT_EQ(master_edge.cend(), it);
+    ++edge_it;
+    ASSERT_EQ(edge_it, edges.end());
+  }
 }
 }

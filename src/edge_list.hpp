@@ -2,6 +2,7 @@
 #define _EDGE_LIST_H_
 
 #include <list>
+#include <set>
 
 typedef double (*scoring_function)(int g, int b, int g2, int b2);
 
@@ -40,16 +41,30 @@ struct edge_base {
 template<typename N>
 scoring_function edge_base<N>::score_function = diff_square;
 
+// Keep a sorted list of edge. The sorting key is the far end of the
+// edge with respect to the current node, as passed to add_edge (id
+// parameter). In effect it is a sorted neighbor list.
 template<typename E>
 struct sorted_edge_list {
   typedef typename std::list<E>::iterator edge_ptr;
+  struct edge_comparator {
+    int id;
+    edge_comparator(int id_) : id(id_) { }
+    inline int far_id(const edge_ptr& e) {
+      return (*e->n1)->id == id ? (*e->n2)->id : (*e->n1)->id;
+    }
+    bool operator()(const edge_ptr& x, const edge_ptr& y) {
+      return far_id(x) < far_id(y);
+    }
+  };
 
   static std::list<E>* master_list;
-  std::list<edge_ptr>  local_list;
+  std::set<edge_ptr, edge_comparator>  local_list;
 
-  sorted_edge_list() = default;
 
-  void add_edge(const edge_ptr& e) { }
+  sorted_edge_list(int id) : local_list(edge_comparator(id)) { }
+
+  void add_edge(const edge_ptr& e) { local_list.insert(e); }
   void merge(sorted_edge_list& rhs) { }
 };
 
