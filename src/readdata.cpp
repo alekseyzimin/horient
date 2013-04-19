@@ -44,6 +44,11 @@ void readdata(list<edge>& master_edge, list<node>& master_node, bool filters){
 	      //Find (or create) pointers to the input nodes.
 	      tmp_n0=master_node.find(node1);
 	      tmp_n1=master_node.find(node2);
+
+	      //Zero out single 'bad' mate-pairs (if there is data in other entry)
+	      if(filters && wght1==1 && wght2>1){wght1=0;}
+	      if(filters && wght2==1 && wght1>1){wght2=0;}
+
 	      //Make a new edge
 	      tmp_e=new edge(tmp_n0,tmp_n1,wght1,wght2);
 	      
@@ -51,8 +56,8 @@ void readdata(list<edge>& master_edge, list<node>& master_node, bool filters){
 	      edge_it=master_edge.addedge(tmp_e);
 
 	      //Use the returned iterator to add in nodes
-	      (&tmp_n0).addedge(edge_it);
-	      (&tmp_n1).addedge(edge_it);
+	      (*tmp_n0).addedge(edge_it);
+	      (*tmp_n1).addedge(edge_it);
 	    }
 
 	}
