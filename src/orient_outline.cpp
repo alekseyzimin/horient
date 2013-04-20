@@ -2,7 +2,7 @@
 #include <list>
 #include <string>
 
-typedef disjoint_set<int> node;
+typedef disjoint_set<node_info> node;
 typedef edge_base<node> edge;
 
 
@@ -41,7 +41,7 @@ int main(int argc, const char **argv)
       join_edge=findbestmerge(master_edge,master_node);
       
       //Perform flipping if necessary
-      if((*join_edge).good<(*join_edge).bad) 
+      if(join_edge->good < join_edge->bad) 
 	//If there are less satisfied than unsatisified mate-pairs on the edge, flip a node.
 	{
 	  tmp_node=pick_flip(master_edge,master_node,join_edge); //Hides several if statements to pick a flip.

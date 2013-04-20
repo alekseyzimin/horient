@@ -29,7 +29,7 @@ TEST(pickflip, Small) {
   auto it = master_edge.cbegin();
 
   // Picks node to flip on edge  
-  picked=pickflip(*it);
+  picked=pick_flip(*it);
 
   //This should pick up condition: n2_bad>n1_bad && n1diff == n2diff 
   auto it2= master_node.find("3");
@@ -41,7 +41,7 @@ TEST(pickflip, Small) {
   EXPECT_EQ( it->n2, it2->second); //Checks to make sure we found the right node to check out pick logic against
 
   //This should pick up the condition: n1diff> n2diff && n1_good !=0
-  picked=pickflip(*it);
+  picked=pick_flip(*it);
   EXPECT_EQ(it2->second, picked);
 
   it++; //test the 3rd edge
@@ -49,7 +49,7 @@ TEST(pickflip, Small) {
   EXPECT_EQ(it2->second, it->n2); //Checks to make sure we found the right node to check out pick logic against
 
   //This should pick up the condition: n2_bad>n1_bad && n1_good == n2_good == 0
-  picked=pickflip(*it);
+  picked=pick_flip(*it);
   EXPECT_EQ(it2->second,picked);
 
   //This should default to picking the first node in the edge.
@@ -57,7 +57,7 @@ TEST(pickflip, Small) {
   it2=master_node.find("3");
   EXPECT_EQ(it2->second,it->n1);  //Checks to make sure we found the right node to check out pick logic against
 
-  picked=pickflip(*it);
+  picked=pick_flip(*it);
   EXPECT_EQ(it2->second,picked);
 
   

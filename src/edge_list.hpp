@@ -24,11 +24,14 @@ struct edge_base {
   // with good2 and bad2 with unreliable data. Not used right now.
   int good, bad;
   int good2, bad2;
+  //merge_loss tracks how many bad are "lost" when this nodes on either side are merged.
+  //This should be cleared to 'NULL' every time we merge either connected node!!
+  int merge_loss; 
 
-  edge_base(N* x, N* y, int g, int b) : n1(x), n2(y), good(g), bad(b), good2(0), bad2(0) { }
+  edge_base(N* x, N* y, int g, int b) : n1(x), n2(y), good(g), bad(b), good2(0), bad2(0), merge_loss(NULL) { }
   edge_base(N* x, N* y, int g, int b, int g2, int b2) :
     n1(x), n2(y),
-    good(g), bad(b), good2(g2), bad2(b2)
+    good(g), bad(b), good2(g2), bad2(b2), merge_loss(NULL)
   { }
 
   bool operator<(const edge_base& e) const {
