@@ -20,7 +20,7 @@ struct node_info {
   void add_edge(const edge_ptr& e) { edges.add_edge(e); }
 
   //function to return neighbor on edge
-  int far_id(const edge_ptr& e) {return (*e->n1) == id ? (*e->n2)->id : (*e->n1)->id;}
+  int far_id(const edge_ptr& e) {return (*e->n1)->id == id ? (*e->n2)->id : (*e->n1)->id;}
 };
 
 typedef std::unordered_map<std::string, node> node_map_type;

@@ -17,20 +17,26 @@ TEST(Node, Simple) {
 
     //Make 2 nodes and an edge. So we can put together
     node n1(0),n2(1);
-    edge_base<node> e1(&n1,&n2,2,1);
     
+    typedef edge_base<node> edge;
+    std::list<edge> master_edge;
+    master_edge.push_front(edge(&n1,&n2,2,1));
+    
+    std::list<edge>::iterator edge_ptr;
+
     EXPECT_EQ(0, n1->id);
     EXPECT_EQ(1, n2->id);
 
     //Primary test of far id. 
-    n1.add_edge(&e1);   
-    EXPECT_EQ((size_t)1, n1->edges.size() );
-    EXPECT_EQ(1, n1.far_id(&e1));
+    edge_ptr=master_edge.begin();
+    n1->add_edge(edge_ptr);   
+    EXPECT_EQ((size_t)1, n1->edges.local_list.size() );
+    EXPECT_EQ(1, n1->far_id(edge_ptr));
 
     //Test that we are actually getting the right ID out.
-    n2.add_edge(&e1);
-    EXPECT_EQ((size_t)1,n2->edges.size() );
-    EXPECT_EQ(0, n2.far_id(&e1));
+    n2->add_edge(edge_ptr);
+    EXPECT_EQ((size_t)1,n2->edges.local_list.size() );
+    EXPECT_EQ(0, n2->far_id(edge_ptr));
   }
     
     

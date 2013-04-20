@@ -5,6 +5,7 @@
 #include <node.hpp>
 
 typedef edge_base<node> edge;
+typedef std::list<edge>::iterator edge_ptr;
 
 //Function to read data into master edge and master node list.
 // filters -- indicates if simple data cleaning should occur
