@@ -112,7 +112,7 @@ namespace {
     
   }
 
-  TEST(findbest, graph1){
+  TEST(findbest, pf_graph1){
     //Tests on 4-node demonstration/example error graph 
     // for choosing least loss.
     
@@ -136,7 +136,7 @@ namespace {
     EXPECT_TRUE(comp_edge(best_merge, master_edge.begin()) );
   }
 
-  TEST(findbest, graph2){
+  TEST(findbest, pf_graph2){
     //Test on graph used for testing all the pick_flip's.
     // find best _should_ pick edge: 5 3 0 11 0 0
 
@@ -178,7 +178,7 @@ namespace {
 
   }
 
-  TEST(findbest, graph3){
+  TEST(findbest, pf_graph3){
     //We should test on some more complicated but knowable graphs. 
     //Adding this blank test so cna re-commit. and so there's
     // at least one error to know not fully tested.
@@ -374,6 +374,50 @@ namespace {
     // EXPECT_EQ( 9, e_it->bad);
 
     
+  }
+
+  TEST(Edge, merge){
+    //Tests on 4-node demonstration/example error graph 
+    // for choosing least loss.
+    
+    const std::string content("0 1 4 0 0 0\n"
+			      "0 2 0 3 0 0\n"
+			      "1 2 5 0 0 0\n"
+			      "1 3 0 3 0 0\n"
+			      "2 3 5 0 0 0\n"
+			      );
+    
+    std::istringstream input(content);
+    ASSERT_TRUE(input.good());
+    std::list<edge> master_edge;
+    node_map_type master_node;
+    readdata(master_edge, master_node, true, input);
+  
+    auto e1_it =master_edge.begin();
+    auto e2_it =master_edge.begin();
+
+    ++e2_it; //Make point to 2nd edge.
+    //Check pointing to expected edges:
+    EXPECT_EQ(5, e1_it->good);
+    EXPECT_EQ(3, e2_it->bad);
+
+    //Just set it so we can change it. 
+    e1_it->merge_loss = 7;
+    EXPECT_EQ(7, e1_it->merge_loss);
+    e1_it->merge(*e2_it);
+
+    auto n1_it =master_node.find("1");
+    auto n3_it =master_node.find("3");
+
+    //Test post conditions of merge.
+    EXPECT_EQ(-1, e1_it->merge_loss);
+    EXPECT_EQ(5, e1_it->good);
+    EXPECT_EQ(3, e1_it->bad);
+    EXPECT_EQ( (size_t)2, (*n1_it->second).edges.local_list.size() );
+    EXPECT_EQ( (size_t)1, (*n3_it->second).edges.local_list.size() );
+    EXPECT_EQ( (size_t)5, master_edge.size());
+    
+
   }
 
 }

@@ -46,12 +46,12 @@ struct edge_base {
 
   //This does not actually destroy the merged edge. It must be destroyed after calling.
   //Note: I don't know if this is actually generalized/templated nicely..or will break outside of this?
-  void merge(const edge_base& e) const{
+  void merge(const edge_base& e) {
     //Update interior values.
-    good+= *e.good;
-    good2+= *e.good2;
-    bad+= *e.bad;
-    bad2+= *e.bad2;
+    good+= e.good;
+    good2+= e.good2;
+    bad+= e.bad;
+    bad2+= e.bad2;
     merge_loss=-1;
 
 
@@ -60,30 +60,39 @@ struct edge_base {
     // guaranteed to be identical pointers as iterator would general.
 
     // Find edge in local list to erase..
-    auto local_it = (*e.n1)->second.edges.local_list.begin(); //just for readability.
-    auto local_end= (*e.n1)->second.edges.local_list.end();
+    auto local_it = (*e.n1).value.edges.local_list.begin(); //just for readability.
+    auto local_end= (*e.n1).value.edges.local_list.end();
 
+    //Have to check id's because only place == or != defined! (for int's).
     //Loop through edge_ptrs until we find the one that points to our passed in edge.
     while(local_it != local_end){
-      if( *local_it == &e) {break;}
-      ++local_it;
+      if( (* (*local_it)->n1)->id != (*e.n1)->id ) {++local_it;continue;}
+      if( (* (*local_it)->n2)->id != (*e.n2)->id ) {++local_it;continue;}
+
+      break;
     }
 
     //local_it should be an iterator to a pointer to same edge as passed in now. 
-    assert( (*local_it->n1)->id == *e.n1.id && (*local_it->n2)->id == *e.n2.id);
+    assert( (    (* (*local_it)->n1)->id == (*e.n1)->id )  
+	    && ( (* (*local_it)->n2)->id == (*e.n2)->id ) ) ;
     
-    (*e.n1)->second.edges.local_list.erase(local_it);
+    (*e.n1).value.edges.local_list.erase(local_it);
 
     //Have to do all of above 2nd time for n2. Just to be careful!
-    local_it = (*e.n2)->second.edges.local_list.begin(); //just for readability.
-    local_end= (*e.n2)->second.edges.local_list.end();
-    
+    local_it = (*e.n2).value.edges.local_list.begin(); //just for readability.
+    local_end= (*e.n2).value.edges.local_list.end();
+
     while(local_it != local_end){
-      if( *local_it == &e) {break;}
-      ++local_it;
+      if( (* (*local_it)->n1)->id != (*e.n1)->id ) {++local_it;continue;}
+      if( (* (*local_it)->n2)->id != (*e.n2)->id ) {++local_it;continue;}
+
+      break;
     }
-    assert( (*local_it->n1)->id == *e.n1.id && (*local_it->n2)->id == *e.n2.id);
-    (*e.n2)->second.edges.local_list.erase(local_it);
+    //local_it should be an iterator to a pointer to same edge as passed in now. 
+    assert( (    (* (*local_it)->n1)->id == (*e.n1)->id )  
+	    && ( (* (*local_it)->n2)->id == (*e.n2)->id ) ) ;
+
+    (*e.n2).value.edges.local_list.erase(local_it);
     
   }	  
 
