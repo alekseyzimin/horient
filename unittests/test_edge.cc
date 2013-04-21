@@ -156,5 +156,12 @@ TEST(Edge, Simple) {
 
   }
 
+  TEST(findbest, graph3){
+    //We should test on some more complicated but knowable graphs. 
+    //Adding this blank test so cna re-commit. and so there's
+    // at least one error to know not fully tested.
+
+    EXPECT_TRUE(false);
+  }
 
 }

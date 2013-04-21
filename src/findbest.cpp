@@ -6,13 +6,8 @@
 #include <cstdlib>
 #include <iostream>
 
-
-//It seems my indentation is off? Indicating I missed closing something somewhere??
-// Not sure where, seems like in my original function name, but that seems to be ok??
-
+//This might not need to reoccur...again.... and again...and again..?
 typedef std::list<edge>::iterator edge_ptr;
-
-
 
 //We're going to be a little less efficient on this and iterate through all the edges,
 // rather thans storing a maximum link per node, and iterating through the nodes. ( O(n) vs. O(e) ) 
