@@ -23,19 +23,13 @@ int find_loss(edge_ptr e){
   node* node_to_flip=NULL; //To hold for flipping and unflipping.
   int diff_n1_edg, diff_n2_edg;//Good-bad difference on edges we find.
 
-
-
   if(e->good < e->bad) {node_to_flip = pick_flip( e );}  //If we need to flip one, pick flip
-
-  std::cout<<"in findloss 1\n";
 
   //Two options actually exist here, we can have a more complicated function which does NOT flip
   // the node before calculating. This will be far more efficient, but messier code.
 
   //We have initially implemented a flip then flip back model.
   if(node_to_flip != NULL){flip_node(node_to_flip);}
-
-  std::cout<<"in findloss 2\n";
 
   //Iterate over internal edge lists to nodes connected to edge (e).
   // When find edge pointing to same neighbor, adjust loss-count
@@ -63,14 +57,16 @@ int find_loss(edge_ptr e){
 
     //If we didn't loop yet, we must have Same edge. Confirm. 
     //(can be removed we we are satisfied rest is working right)
-    if( (*e->n1)->far_id(*n1_edg_it) != (*e->n2)->far_id(*n2_edg_it) ) {std::cerr<<"something funky\n";exit(EXIT_FAILURE);}
+    if( (*e->n1)->far_id(*n1_edg_it) != (*e->n2)->far_id(*n2_edg_it) ) 
+      {std::cerr<<"something funky\n";exit(EXIT_FAILURE);}
 
     //We have same edge. So now we calculate options lost.
     diff_n1_edg= (*n1_edg_it)->good - (*n1_edg_it)->bad;  //Get differences on edge from n1
     diff_n2_edg= (*n2_edg_it)->good - (*n2_edg_it)->bad;  //Get differences on edge from n2
 
+    //Checking that one diff is <0 and one diff >0 means one edge is mostly 'good' and one mostly 'bad'
     if( (diff_n1_edg < 0 || diff_n2_edg < 0 ) && (diff_n1_edg > 0 || diff_n2_edg > 0 ) ){
-      loss_cnt+=std::min(std::abs(diff_n1_edg), std::abs(diff_n2_edg) );
+      loss_cnt+=std::min(std::abs(diff_n1_edg), std::abs(diff_n2_edg) ); //loss count always positive or 0
     }
 
     //We've increased expected merge loss from found edge to shared neighbor. Now we increment either 
@@ -79,11 +75,13 @@ int find_loss(edge_ptr e){
 
   }
 
-  std::cout<<"in findloss 3\n";
-
   //Before returning, we have to unflip the node, if we flipped one.
   if(node_to_flip != NULL) {flip_node(node_to_flip);}
 
+  //Set the merge_loss in the edge we computed for.
+  e->merge_loss=loss_cnt;
+
+  //Return the calculated merge_loss
   return loss_cnt;
 
 }
