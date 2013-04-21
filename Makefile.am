@@ -32,4 +32,6 @@ all_tests_SOURCES = unittests/gtest/gtest-all.cc unittests/gtest/gtest_main.cc u
 
 all_tests_SOURCES += unittests/test_disjoint_set.cc			\
                      unittests/test_edge.cc unittests/test_node.cc	\
-                     unittests/test_read_data.cc src/readdata.cpp
+                     unittests/test_read_data.cc src/readdata.cpp 	\
+		     src/findloss.cpp \
+			unittests/test_pickflip.cc src/pickflip.cpp 

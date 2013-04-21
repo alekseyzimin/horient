@@ -36,6 +36,6 @@ edge* findbestmerge(std::list<edge>& master_edge);
 //PRECONDITION: edge e exists, nodes connected exist, e->merge_loss == NULL 
 //POSTCONDITION: e->merge_loss is set.  merge_loss also returned.
 //POSTCONDITION: nodes connected to 'e' are returned to original state.
-int findloss(edge_ptr e);
+int find_loss(edge_ptr e);
 
 
