@@ -16,10 +16,11 @@ YAGGO_SOURCES = # Append all file to be built by yaggo
 ##############################
 # Programs
 ##############################
-bin_PROGRAMS = gen_orient
+bin_PROGRAMS = horient
 
-gen_orient_SOURCES = src/gen_orient.cpp
-noinst_HEADERS += src/gen_orient.h
+horient_SOURCES = src/horient.cc src/readdata.cpp
+noinst_HEADERS += src/horient.hpp
+YAGGO_SOURCES += src/horient_cmdline.hpp
 
 ##############################
 # Unit tests

@@ -1,0 +1,17 @@
+purpose "Orient contigs with respect to each other."
+description <<EOS
+Longer blahblah
+EOS
+
+option("o", "output") {
+  description "Output file (stdout)"
+  c_string }
+option("f", "foff") {
+  description "Turn filter off"
+  off }
+# option("w", "weight") {
+#   description "Weighting for column 5 and 6"
+#   double }
+arg("input") {
+  description "Tally file"
+  c_string; typestr "path" }
