@@ -37,6 +37,7 @@ std::pair<int, int> sum_edges(const Container& list, const edge_ptr& e) {
 }
 
 //Simple compare function for two edge_ptrs... which might be different iterators!
+//(I might disagree on style of this being "more readable" :)
 bool comp_edge(const edge_ptr& x, const edge_ptr& y){
   return (( (*x->n1)->id == (*y->n2)->id ) && ( (*x->n2)->id == (*y->n1)->id ) ) ||
     (( (*x->n2)->id == (*y->n2)->id ) && ( (*x->n1)->id == (*y->n1)->id ));
@@ -52,8 +53,6 @@ node* pick_flip(const edge_ptr& join_edge){
 
   // Sum up good and bad mate-pairs for all edges incident to Node 1
   // in edge(join_edge)
-
-  //std::cout<<"p-2 \n";
 
   //Sum up good and bad mate-pairs for all edges incident to Node 2 in edge(join_edge)
   tie(n1_good, n1_bad) = sum_edges((*join_edge->n1)->edges.local_list, join_edge);
