@@ -28,7 +28,7 @@ int find_loss(edge_ptr& e) {
   int   loss_cnt     = 0;
   node* node_to_flip = NULL;    //To hold for flipping and unflipping.
 
-  if(e->good < e->bad) {node_to_flip = pick_flip( e );}  //If we need to flip one, pick flip
+  if(e->good < e->bad) {node_to_flip = &(pick_flip( e ));}  //If we need to flip one, pick flip
 
   // Two options actually exist here, we can have a more complicated
   // function which does NOT flip the node before calculating. This
@@ -41,10 +41,10 @@ int find_loss(edge_ptr& e) {
   // When find edge pointing to same neighbor, adjust loss-count
 
   // These should be iterator which dereference to an edge_ptr.
-  auto n1_edg_it = (*e->n1)->edges.local_list.begin();
-  auto n2_edg_it = (*e->n2)->edges.local_list.begin();
-  auto n1_edg_end = (*e->n1)->edges.local_list.end();
-  auto n2_edg_end = (*e->n2)->edges.local_list.end();
+  auto n1_edg_it = e->n1->edges.local_list.begin();
+  auto n2_edg_it = e->n2->edges.local_list.begin();
+  auto n1_edg_end = e->n1->edges.local_list.end();
+  auto n2_edg_end = e->n2->edges.local_list.end();
 
   //Not for loop because we increment independently.
   // should loop through the two sorted edge lists interior to the two nodes.
@@ -56,12 +56,12 @@ int find_loss(edge_ptr& e) {
     //Check if nodes point to different edges.
 
     //Not same. N1's edge neighbor is less. Since in sorted, increment to next edge in N1
-    if( (*e->n1)->far_id(*n1_edg_it) < (*e->n2)->far_id(*n2_edg_it) ) {n1_edg_it++;continue;}
+    if( e->n1->far_id(*n1_edg_it) < e->n2->far_id(*n2_edg_it) ) {n1_edg_it++;continue;}
     //Not same. N2's edge neighbor is less. Since in sorted, increment to next edge in N2
-    if( (*e->n1)->far_id(*n1_edg_it) > (*e->n2)->far_id(*n2_edg_it) ) {n2_edg_it++;continue;}
+    if( e->n1->far_id(*n1_edg_it) > e->n2->far_id(*n2_edg_it) ) {n2_edg_it++;continue;}
 
-    //If we didn't loop yet, we must have Same neighbor. Confirm.
-    assert((*e->n1)->far_id(*n1_edg_it) == (*e->n2)->far_id(*n2_edg_it) );
+    //If we didn't loop yet, we must have Same edge. Confirm.
+    assert(e->n1->far_id(*n1_edg_it) == e->n2->far_id(*n2_edg_it) );
 
     //We have same edge. So now we calculate options lost.
     int diff_n1_edg= (*n1_edg_it)->good - (*n1_edg_it)->bad;

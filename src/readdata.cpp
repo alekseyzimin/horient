@@ -47,7 +47,7 @@ std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::ist
     if(filters && wght2==1 && wght1>1) { wght2=0; }
 
     //Make a new edge
-    master_edge.push_front(edge(&tmp_n0, &tmp_n1, wght1, wght2));
+    master_edge.push_front(edge(tmp_n0, tmp_n1, wght1, wght2));
 
     //Use the returned iterator to add in nodes
     tmp_n0->add_edge(master_edge.begin());

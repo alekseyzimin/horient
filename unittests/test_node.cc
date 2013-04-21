@@ -15,7 +15,7 @@ protected:
 
   virtual void SetUp() {
     //Make 2 nodes and an edge. So we can put together
-    master_edge.push_front(edge(&n1, &n2, 2, 1, 5, 3));
+    master_edge.push_front(edge(n1, n2, 2, 1, 5, 3));
   }
 };
 
@@ -64,12 +64,12 @@ protected:
     n1->add_edge(edge_ptr);
 
     //Check IDs
-    EXPECT_EQ( 0, (*edge_ptr->n1)->id);
-    EXPECT_EQ( 1, (*edge_ptr->n2)->id);
+    EXPECT_EQ( 0, edge_ptr->n1->id);
+    EXPECT_EQ( 1, edge_ptr->n2->id);
 
     //Check Orients
-    EXPECT_EQ( 1, (*edge_ptr->n1)->orient);
-    EXPECT_EQ( 1, (*edge_ptr->n2)->orient);
+    EXPECT_EQ( 1, edge_ptr->n1->orient);
+    EXPECT_EQ( 1, edge_ptr->n2->orient);
 
     //Check good/bad
     EXPECT_EQ( 2, edge_ptr->good );
@@ -81,7 +81,7 @@ protected:
     n1->flip_node();
 
     //Orient should be different, and good/bad on edge swapped.
-    EXPECT_EQ( -1, (*edge_ptr->n1)->orient);
+    EXPECT_EQ( -1, edge_ptr->n1->orient);
     EXPECT_EQ( 1, edge_ptr->good );
     EXPECT_EQ( 2, edge_ptr->bad  );
     EXPECT_EQ( 3, edge_ptr->good2);
@@ -95,7 +95,7 @@ protected:
 
     //Could change orient on node 2,
     // and return good/bad on edge to original values.
-    EXPECT_EQ( -1, (*edge_ptr->n2)->orient);
+    EXPECT_EQ( -1, edge_ptr->n2->orient);
     EXPECT_NE( 2, edge_ptr->good );
     EXPECT_NE( 1, edge_ptr->bad  );
     EXPECT_NE( 5, edge_ptr->good2);
@@ -107,7 +107,7 @@ protected:
 
     //Should change orient on node 2, (always, this time to original)
     // and return good/bad on edge to original values. (because it's added)
-    EXPECT_EQ( 1, (*edge_ptr->n2)->orient);
+    EXPECT_EQ( 1, edge_ptr->n2->orient);
     EXPECT_EQ( 2, edge_ptr->good );
     EXPECT_EQ( 1, edge_ptr->bad  );
     EXPECT_EQ( 5, edge_ptr->good2);
