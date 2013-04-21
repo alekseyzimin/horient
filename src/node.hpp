@@ -53,9 +53,9 @@ struct node_info {
     //Have to merge edges.
 
     //Update interior int's
-    size += n_old.size; 
-    int_good += n_old.int_good; 
-    int_bad  += n_old.int_bad;
+    size += (*n_old).size; 
+    int_good += (*n_old).int_good; 
+    int_bad  += (*n_old).int_bad;
 
     //Cycle through all edges in both nodes, take one of three actions:
     // If edge between them, move interior. -- ZERO OUT good/bad.
@@ -68,9 +68,9 @@ struct node_info {
     // These should be iterator which dereference to an edge_ptr.
     //To reduce editing labels below... n1= self, n2= n_old.
     auto n1_edg_it = edges.local_list.begin();
-    auto n2_edg_it = n_old.edges.local_list.begin();
+    auto n2_edg_it = (*n_old).edges.local_list.begin();
     auto n1_edg_end = edges.local_list.end();
-    auto n2_edg_end = n_old.edges.local_list.end();
+    auto n2_edg_end = (*n_old).edges.local_list.end();
 
     //Get a node pointer which points to ourself for modifying edges.
     node* self;
@@ -116,7 +116,7 @@ struct node_info {
 	add_edge(*n2_edg_it);
 
 	++n2_edg_it;continue;
-      `}
+      }
 
       //If we didn't loop yet, we must have Same neighbor. Confirm.
       assert( far_id(*n1_edg_it) == n_old->far_id(*n2_edg_it) );
