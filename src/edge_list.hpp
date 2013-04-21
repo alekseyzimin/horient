@@ -55,6 +55,11 @@ struct edge_base {
     merge_loss=-1;
 
 
+    //If we pass in a edge_ptr we can use "comp_edge" ... alternatively, we could
+    // change "comp_edge" to actually compare edges, instead of pointers, then pass
+    // into it more derefenced things. Have to make those tiered changes,
+    // This would all be the cleaner approach. Works for now. Can clean up later.
+
     //Because we have an edge_base / edge in... have to do this messier. 
     //  Maybe we can just pass a pointer to the actual edge? not sure if
     // guaranteed to be identical pointers as iterator would general.

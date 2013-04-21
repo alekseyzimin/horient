@@ -44,7 +44,92 @@ struct node_info {
 
   }
 
+  //Function to merge: Assumption that we pass the CORRECT node which will become child. 
+  void merge(const node& n_old){
+   
+    //Have to move shared edge interior.
+    //Have to update size
+    //Have to merge int_good, int_bad.
+    //Have to merge edges.
+
+    //Update interior int's
+    size += n_old.size; 
+    int_good += n_old.int_good; 
+    int_bad  += n_old.int_bad;
+
+    //Cycle through all edges in both nodes, take one of three actions:
+    // If edge between them, move interior. -- ZERO OUT good/bad.
+    // If shared neighbor, merge them.
+    // If not shared neighbor, 
+    //       if self, reset merge_loss
+    //       if in n_old, reset merge_loss, relabel near_id, then add to local list.
+ 
+
+    // These should be iterator which dereference to an edge_ptr.
+    //To reduce editing labels below... n1= self, n2= n_old.
+    auto n1_edg_it = edges.local_list.begin();
+    auto n2_edg_it = n_old.edges.local_list.begin();
+    auto n1_edg_end = edges.local_list.end();
+    auto n2_edg_end = n_old.edges.local_list.end();
+
+    //Get a node pointer which points to ourself for modifying edges.
+    node* self;
+    if( (* (*n1_edg_it)->n1)->id == id ) {self = (*n1_edg_it)->n1;}
+    else{ self= (*n1_edg_it)->n2;}
     
+    //Not for loop because we increment independently.
+    // should loop through the two sorted edge lists interior to the two nodes.
+    while(n1_edg_it != n1_edg_end && n2_edg_it != n2_edg_end) {
+      //If edge is identical, it's the merge edge.
+      // Move interior. Zero. Go to next loop
+      if( comp_edge(*n1_edg_it, *n2_edg_it) ){
+	  int_good+= (*n1_edg_it)->good;
+	  int_bad+=  (*n1_edg_it)->bad;
+
+	  //These help fix that master node-list still has the edge.
+	  (*n1_edg_it)->good = 0;
+	  (*n1_edg_it)->bad  = 0;
+	  (*n1_edg_it)->good2= 0;
+	  (*n1_edg_it)->bad2 = 0;
+	  (*n1_edg_it)->merge_loss=-1; //Just in case?
+
+	  //Incrememnt both edge iterators, continue.
+	  ++n1_edg_it; ++n2_edg_it; continue;
+	}
+
+      //Check if nodes point to different edges.
+      
+      //Not same. N1's edge neighbor is less. Since in sorted, increment to next edge in N1
+      // Since we are getting rid of N2/old... we just go to next edge in N1
+      if( far_id(*n1_edg_it) < n_old->far_id(*n2_edg_it) ) {++n1_edg_it;continue;}
+      
+      //Not same. N2's edge neighbor is less. We will increment to next edge in N2, since sorted.
+      // But that means we also need to move this edge to N1.
+      if( far_id(*n1_edg_it) > n_old->far_id(*n2_edg_it) ) {
+	//Change values, then just call add_edge function on it.
+	(*n2_edg_it)->merge_loss=-1;
+
+	//This needs to get set to a pointer to the disjoint set this is an element of. 
+	if( (* (*n2_edg_it)->n1)->id == n_old.id ) { (*n2_edg_it)->n1 = self;}
+	else{ (*n2_edg_it)->n1 = self;}
+
+	add_edge(*n2_edg_it);
+
+	++n2_edg_it;continue;
+      `}
+
+      //If we didn't loop yet, we must have Same neighbor. Confirm.
+      assert( far_id(*n1_edg_it) == n_old->far_id(*n2_edg_it) );
+
+      //Call merge edge on MY edge.
+      (*n1_edg_it)->merge(*n2_edg_it);
+
+      //Increment one iterator.
+      ++n1_edge_it;
+
+    }
+
+  } 
     
   
     
