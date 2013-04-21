@@ -44,7 +44,7 @@ edge_ptr findbestmerge(std::list<edge>& master_edge);
 //PRECONDITION: edge e exists, nodes connected exist, e->merge_loss == NULL 
 //POSTCONDITION: e->merge_loss is set.  merge_loss also returned.
 //POSTCONDITION: nodes connected to 'e' are returned to original state.
-int find_loss(edge_ptr e);
+int find_loss(edge_ptr& e);
 
 //Function to set if two edges are the same from pointers to them. (iterators)
 bool comp_edge(const edge_ptr& x, const edge_ptr& y);
