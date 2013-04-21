@@ -1,3 +1,6 @@
+#ifndef _HORIENT_H_
+#define _HORIENT_H_
+
 #include <istream>
 #include <list>
 
@@ -18,7 +21,7 @@ void readdata(std::list<edge>& master_edge, node_map_type& master_node, bool fil
 //Function to pick a node to flip
 //PRECONDITION: we have decided to flip a node connected to the passed edge
 //POSTCONDITION: we return a pointer to a node we should flip (that is connected to the edge)
-node* pick_flip(edge join_edge);
+node* pick_flip(edge_ptr join_edge);
 
 //Function to change orientation of node, and all respective data.
 //PRECONDITION: node-n0 exists, and has edges connected to it.
@@ -38,4 +41,11 @@ edge* findbestmerge(std::list<edge>& master_edge);
 //POSTCONDITION: nodes connected to 'e' are returned to original state.
 int find_loss(edge_ptr e);
 
+//Function to set if two edges are the same from pointers to them. (iterators)
+bool comp_edge(edge_ptr x, edge_ptr y);
 
+
+//Dummy function for now.
+void flip_node(node* n1);
+
+#endif /* _HORIENT_H_ */

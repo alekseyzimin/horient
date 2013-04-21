@@ -20,27 +20,46 @@ TEST(Edge, Simple) {
   EXPECT_EQ(2.0, e0.score());
   EXPECT_FLOAT_EQ(1.0 / 3.0, e1.score());
 }
-
-  TEST(Find_loss, Simple){
-
-  const std::string content("0 1 4 0 0 0\n"
-                            "0 2 0 3 0 0\n"
-                            "1 2 5 0 0 0\n"
-                            "1 3 0 3 0 0\n"
-                            "2 3 5 0 0 0\n"
-                            );
+  TEST(compedge, simple){
+  
+    const std::string content("1 2 0 3 0 0\n");
 
   std::istringstream input(content);
   ASSERT_TRUE(input.good());
   std::list<edge> master_edge;
   node_map_type master_node;
   readdata(master_edge, master_node, true, input);
-  
+  EXPECT_EQ( (size_t)2,master_node.size() );  
 
-  //Test last, 2nd to last, and 3rd to last edge for their expected loss
-  EXPECT_EQ(3, find_loss(master_edge.begin()));
-  EXPECT_EQ(0, find_loss(++(master_edge.begin()) ) );
-  EXPECT_EQ(6, find_loss(++(++(master_edge.begin()) )) );
+  EXPECT_TRUE(comp_edge(master_edge.begin(),master_edge.begin()) );
 
   }
+
+  // TEST(Find_loss, Simple){
+
+  // const std::string content("0 1 4 0 0 0\n"
+  //                           "0 2 0 3 0 0\n"
+  //                           "1 2 5 0 0 0\n"
+  //                           "1 3 0 3 0 0\n"
+  //                           "2 3 5 0 0 0\n"
+  //                           );
+
+  // std::istringstream input(content);
+  // ASSERT_TRUE(input.good());
+  // std::list<edge> master_edge;
+  // node_map_type master_node;
+  // readdata(master_edge, master_node, true, input);
+  
+
+  // auto it=master_edge.begin();
+
+  // //Test last, 2nd to last, and 3rd to last edge for their expected loss
+  // EXPECT_EQ(3, find_loss(it));
+  // ++it;
+  // EXPECT_EQ(0, find_loss(it) );
+  // ++it;
+  // std::cout<<"test?\n";
+  // EXPECT_EQ(6, find_loss(it) );
+
+  // }
 }

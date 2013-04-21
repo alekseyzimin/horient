@@ -23,13 +23,19 @@ int find_loss(edge_ptr e){
   node* node_to_flip=NULL; //To hold for flipping and unflipping.
   int diff_n1_edg, diff_n2_edg;//Good-bad difference on edges we find.
 
-  if(e->good < e->bad) {node_to_flip = pick_flip( *e );}  //If we need to flip one, pick flip
+
+
+  if(e->good < e->bad) {node_to_flip = pick_flip( e );}  //If we need to flip one, pick flip
+
+  std::cout<<"in findloss 1\n";
 
   //Two options actually exist here, we can have a more complicated function which does NOT flip
   // the node before calculating. This will be far more efficient, but messier code.
 
   //We have initially implemented a flip then flip back model.
   if(node_to_flip != NULL){flip_node(node_to_flip);}
+
+  std::cout<<"in findloss 2\n";
 
   //Iterate over internal edge lists to nodes connected to edge (e).
   // When find edge pointing to same neighbor, adjust loss-count
@@ -72,6 +78,8 @@ int find_loss(edge_ptr e){
     n1_edg_it++;
 
   }
+
+  std::cout<<"in findloss 3\n";
 
   //Before returning, we have to unflip the node, if we flipped one.
   if(node_to_flip != NULL) {flip_node(node_to_flip);}

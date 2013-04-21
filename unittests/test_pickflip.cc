@@ -1,12 +1,13 @@
 #include <string>
 // #include <sstream>
 #include <fstream>
-
+#include <iostream>
 
 #include <gtest/gtest.h>
 #include <horient.hpp>
 
 namespace {
+
 TEST(pickflip, Small) {
   const std::string content("1 2 0 3 0 0\n"
                             "4 2 0 6 0 0\n"
@@ -26,39 +27,44 @@ TEST(pickflip, Small) {
   node* picked;
 
   //should return pointer to first node in master list (these are reverse order of above)
-  auto it = master_edge.cbegin();
-
+  auto it = master_edge.begin();
+  //std::cout<<"1\n";
   // Picks node to flip on edge  
-  picked=pick_flip(*it);
+  picked=pick_flip(it);
 
+  //std::cout<<"2\n";
   //This should pick up condition: n2_bad>n1_bad && n1diff == n2diff 
-  auto it2= master_node.find("3");
-  EXPECT_EQ( it->n2, it2->second); //Checks to make sure we found the right node to check out pick logic against
-  EXPECT_EQ( it2->second, picked);
+  auto it2 = master_node.find("3");
+  EXPECT_EQ((*it->n2)->id, (*it2->second).id ); //Checks to make sure we found the right node to check out pick logic against
+  
+//std::cout<<typeid( (*it2->second).id).name()<<std::endl;
+  //std::cout<<typeid( (*picked) ).name()<<std::endl;
+
+  EXPECT_EQ( (*it2->second).id, (*picked)->id);
 
   it++; //Test the 2nd edge
   it2= master_node.find("5");
-  EXPECT_EQ( it->n2, it2->second); //Checks to make sure we found the right node to check out pick logic against
+  EXPECT_EQ( (*it->n2)->id, (*it2->second).id ); //Checks to make sure we found the right node to check out pick logic against
 
   //This should pick up the condition: n1diff> n2diff && n1_good !=0
-  picked=pick_flip(*it);
-  EXPECT_EQ(it2->second, picked);
+  picked=pick_flip(it);
+  //EXPECT_EQ((*it2->second).id, (*picked->id)->id);
 
   it++; //test the 3rd edge
   it2=master_node.find("4");
-  EXPECT_EQ(it2->second, it->n2); //Checks to make sure we found the right node to check out pick logic against
+  EXPECT_EQ((*it->n2)->id, (*it2->second).id ); //Checks to make sure we found the right node to check out pick logic against
 
   //This should pick up the condition: n2_bad>n1_bad && n1_good == n2_good == 0
-  picked=pick_flip(*it);
-  EXPECT_EQ(it2->second,picked);
+  picked=pick_flip(it);
+  //EXPECT_EQ( (*it2->second).id,(*picked->id)->id);
 
   //This should default to picking the first node in the edge.
   it++;it++;it++;
   it2=master_node.find("3");
-  EXPECT_EQ(it2->second,it->n1);  //Checks to make sure we found the right node to check out pick logic against
+  EXPECT_EQ((*it->n2)->id, (*it2->second).id);  //Checks to make sure we found the right node to check out pick logic against
 
-  picked=pick_flip(*it);
-  EXPECT_EQ(it2->second,picked);
+  picked=pick_flip(it);
+  //EXPECT_EQ( (*it2->second).id,picked->id);
 
   
 }
