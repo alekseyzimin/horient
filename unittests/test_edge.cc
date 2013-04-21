@@ -42,9 +42,12 @@ TEST(Edge, Simple) {
     //         && (diff_n1_edg > 0 || diff_n2_edg > 0 )
 
     // Edge 1 (last) should generate diff_n1_edg>0 && diff_n2_edg<0
-    // Edge 2 (2nd to last) should generate diff_n1_edg>0 && diff_n2_edg>0
+    // Edge 2 (2nd to last) tests finding a loss when a flip occurs.
+    //   generates: diff_n1_edg>0 && diff_n2_edg<0
     // Edge 3 (middle) should generate two sets of :
     //      the diff edges. 
+    // Edge 4 should flip node 0, and then generate:
+    //  diff_n1_edg<0 && diff_n2_edg>0
 
   const std::string content("0 1 4 0 0 0\n"
                             "0 2 0 3 0 0\n"
@@ -63,19 +66,37 @@ TEST(Edge, Simple) {
   auto it=master_edge.begin();
 
   //Test last, 2nd to last, and 3rd to last edge for their expected loss
+  //Edge: 2 3 5 0 0 0
   EXPECT_EQ(-1, it->merge_loss);
   EXPECT_EQ(3, find_loss(it));
   EXPECT_EQ(3, it->merge_loss);
 
-  ++it;
+  ++it; //Edge 1 3 0 3 0 0
   EXPECT_EQ(-1, it->merge_loss);
   EXPECT_EQ(5, find_loss(it) );
   EXPECT_EQ(5, it->merge_loss);
 
-  ++it;
+  ++it; //Edge 1 2 5 0 0 0
   EXPECT_EQ(-1, it->merge_loss);
   EXPECT_EQ(6, find_loss(it) );
   EXPECT_EQ(6, it->merge_loss);
+
+  ++it; //Edge 0 2 0 3 0 0
+  EXPECT_EQ(-1, it->merge_loss);
+
+  //Also check that node orient is restore to original!
+  EXPECT_EQ( 1, (*it->n1)->orient);
+
+  //Find loss, which should include flip.
+  EXPECT_EQ(4, find_loss(it) );
+  EXPECT_EQ(4, it->merge_loss);
+
+  //Check that orient doesn't leave changed.
+  EXPECT_EQ(1, (*it->n1)->orient);
+
+  ++it; //EDGE 0 1 4 0 0 0
+  EXPECT_EQ(-1, it->merge_loss);
+  //  EXPECT_EQ(
 
   //Should have far more complex Find Loss. Above just tests
   // the actual comparison that adds. and once.
