@@ -36,8 +36,8 @@ template<typename T>
 typename disjoint_set<T>::set_type union_set(disjoint_set<T>& x, disjoint_set<T>& y) {
   typedef typename disjoint_set<T>::set_type set_type;
   set_type xRoot = x.find();
-  set_type yRoot = y.find()
-;
+  set_type yRoot = y.find();
+
   if(xRoot == yRoot)
     return xRoot;
   if(xRoot->rank < yRoot->rank) {
