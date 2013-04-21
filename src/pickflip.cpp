@@ -25,9 +25,8 @@ bool comp_edge(edge_ptr x, edge_ptr y){
   return false;
 }
 
-//dummy.
-void flip_node(node* n1){ };
 
+//Probably another extra, unnecessary typedef. They are everywhere!!
 typedef std::list<edge>::iterator edge_ptr;
 
 //This function picks the node we want to flip based on the good & bad weights on edges incident to 

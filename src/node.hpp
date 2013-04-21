@@ -4,9 +4,19 @@
 #include <unordered_map>
 #include <disjoint_set.hpp>
 #include <edge_list.hpp>
+#include <utility>   //for swap;
 
 struct node_info;
 typedef disjoint_set<node_info> node;
+
+//Function to actually merge two nodes. Does copying and calling of union.
+// void node_merge(node* n1, node* n2){
+
+//   (*n1)->merge_ni(n2);
+
+//   union_set(n1,n2);
+
+// }
 
 struct node_info {
   int id;
@@ -21,6 +31,23 @@ struct node_info {
 
   //function to return neighbor on edge
   int far_id(const edge_ptr& e) {return (*e->n1)->id == id ? (*e->n2)->id : (*e->n1)->id;}
+
+  //flips this node
+  void flip_node(){
+    orient*=-1; //Easy part!
+    
+    //Now, iterate through all the edges, and swap their good-bad.
+    for(auto edge_it=edges.local_list.begin(); edge_it != edges.local_list.end(); edge_it++){
+      std::swap( (*edge_it)->good, (*edge_it)->bad );
+      std::swap( (*edge_it)->good2, (*edge_it)->bad2);
+    }
+
+  }
+
+    
+    
+  
+    
 };
 
 typedef std::unordered_map<std::string, node> node_map_type;

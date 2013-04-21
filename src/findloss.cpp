@@ -29,7 +29,7 @@ int find_loss(edge_ptr e){
   // the node before calculating. This will be far more efficient, but messier code.
 
   //We have initially implemented a flip then flip back model.
-  if(node_to_flip != NULL){flip_node(node_to_flip);}
+  if(node_to_flip){(*node_to_flip)->flip_node();}
 
   //Iterate over internal edge lists to nodes connected to edge (e).
   // When find edge pointing to same neighbor, adjust loss-count
@@ -76,7 +76,7 @@ int find_loss(edge_ptr e){
   }
 
   //Before returning, we have to unflip the node, if we flipped one.
-  if(node_to_flip != NULL) {flip_node(node_to_flip);}
+  if(node_to_flip) { (*node_to_flip)->flip_node();}
 
   //Set the merge_loss in the edge we computed for.
   e->merge_loss=loss_cnt;

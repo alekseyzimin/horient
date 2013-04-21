@@ -38,7 +38,8 @@ TEST(Edge, Simple) {
   TEST(Find_loss, Simple){
     //In find_loss the 3 edges tested should test the conditions in
     // line:
-    // (diff_n1_edg < 0 || diff_n2_edg < 0 ) && (diff_n1_edg > 0 || diff_n2_edg > 0 )
+    // (diff_n1_edg < 0 || diff_n2_edg < 0 ) 
+    //         && (diff_n1_edg > 0 || diff_n2_edg > 0 )
 
     // Edge 1 (last) should generate diff_n1_edg>0 && diff_n2_edg<0
     // Edge 2 (2nd to last) should generate diff_n1_edg>0 && diff_n2_edg>0
@@ -68,8 +69,8 @@ TEST(Edge, Simple) {
 
   ++it;
   EXPECT_EQ(-1, it->merge_loss);
-  EXPECT_EQ(0, find_loss(it) );
-  EXPECT_EQ(0, it->merge_loss);
+  EXPECT_EQ(5, find_loss(it) );
+  EXPECT_EQ(5, it->merge_loss);
 
   ++it;
   EXPECT_EQ(-1, it->merge_loss);

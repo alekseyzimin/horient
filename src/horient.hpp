@@ -27,7 +27,12 @@ node* pick_flip(edge_ptr join_edge);
 //PRECONDITION: node-n0 exists, and has edges connected to it.
 //POSTCONDITION: if orient = 1  -> orient = -1 :  if orient = -1 -> orient = 1
 //POSTCONDITION: All edges connected to node have swapped good/bad values. 
-void flip_node(node* n0);
+
+// Implemented inside "node information" struct now.
+
+//void flip_node(node* n0);
+
+
 
 //Function to determine the best edge to merge over.
 //PRECONDITION: master_edge !empty
