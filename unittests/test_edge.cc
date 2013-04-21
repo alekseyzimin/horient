@@ -186,7 +186,9 @@ namespace {
     EXPECT_TRUE(false);
   }
 
-  TEST(Edge, removals){
+  TEST(Edge, local_removal){
+    //Only tests removal inside a node.
+
     //This tests what conditions happen when we delete edges
     // from various data structures we have. 
     //?? Do they all point to same edges? Or what's going on??
@@ -221,6 +223,82 @@ namespace {
     EXPECT_EQ( &(*e_it), &(*(*node3_first_edge_it)));
     //Or are the bads equal then?
     EXPECT_EQ( e_it->bad, (*node3_first_edge_it)->bad);
+    //And can we find it?
+    auto tmp_it= n3_it->second->edges.local_list.begin(); //to get type
+    tmp_it= n3_it->second->edges.local_list.find( e_it );
+    EXPECT_EQ( tmp_it, node3_first_edge_it);
+
+    //What happens when we erase an edge from a LOCAL_LIST to master?
+    auto n0_it = master_node.find("0");
+    auto n0_edg_it = (*n0_it->second).edges.local_list.begin();
+
+    //Check this is last edge in master list
+    e_it= master_edge.end();
+    --e_it; //point to last actual edge.
+
+    //Check we are pointing to same content.
+    EXPECT_EQ(4, e_it->good);
+    EXPECT_EQ(4, (*n0_edg_it)->good);
+
+    //Now remove it frmo local_list.
+    (*n0_it->second).edges.local_list.erase(n0_edg_it);
+
+    //Now, reset master iterator, and see what is in same spot.
+    e_it= master_edge.end();
+    --e_it;
+    
+    //Actually, this should NOT change the size or elements in master!
+    EXPECT_EQ( (size_t)5 , master_edge.size() );
+    EXPECT_EQ( 4, e_it->good);
+
+    //Should change size in local list, and beginning.
+    EXPECT_EQ( (size_t)1, (*n0_it->second).edges.local_list.size() );
+    n0_edg_it = (*n0_it->second).edges.local_list.begin();
+    EXPECT_EQ( 2, (*n0_edg_it)->bad);
+  }
+
+
+
+  TEST(Edge, global_removal){
+    //This tests what conditions happen when we delete edges
+    // from various data structures we have. 
+    //?? Do they all point to same edges? Or what's going on??
+
+    //We want a complex enough data structure to have nodes with
+    //multiple edges, etc....
+    const std::string content("0 1 4 0 0 0\n"
+			      "0 2 0 2 0 0\n"
+			      "1 2 6 0 0 0\n"
+			      "1 3 0 3 0 0\n"
+			      "2 3 5 0 0 0\n"
+			      );
+    
+    std::istringstream input(content);
+    ASSERT_TRUE(input.good());
+    std::list<edge> master_edge;
+    node_map_type master_node;
+    readdata(master_edge, master_node, true, input);
+ 
+    auto e_it = master_edge.begin();
+    //auto n_it=master_node.begin();
+
+    ++e_it; // Should point to 2nd from bottom edge: 1 3 0 3 0 0
+    EXPECT_EQ( 3, e_it->bad); //check pointing to right edge.
+
+    auto n3_it = master_node.find("3");
+
+    //Iterator to first pointer to edge for node_3
+    auto node3_first_edge_it = n3_it->second->edges.local_list.begin();
+
+    //Expect address of the edges pointed to are equal?
+    EXPECT_EQ( &(*e_it), &(*(*node3_first_edge_it)));
+    //Or are the bads equal then?
+    EXPECT_EQ( e_it->bad, (*node3_first_edge_it)->bad);
+    //And can we find it?
+    auto tmp_it= n3_it->second->edges.local_list.begin(); //to get type
+    tmp_it= n3_it->second->edges.local_list.find( e_it );
+    EXPECT_EQ( tmp_it, node3_first_edge_it);
+
 
     //Now, if I erase the edge in the master, what happens?
     master_edge.erase(e_it);
@@ -249,34 +327,6 @@ namespace {
     EXPECT_EQ( 5, e_it->good);
     ++e_it; //point to second edge
     EXPECT_EQ( 6, e_it->good);
-
-    //What happens when we erase an edge from a LOCAL_LIST to master?
-    auto n0_it = master_node.find("0");
-    auto n0_edg_it = (*n0_it->second).edges.local_list.begin();
-
-    //Check this is last edge in master list
-    e_it= master_edge.end();
-    --e_it; //point to last actual edge.
-
-    //Check we are pointing to same content.
-    EXPECT_EQ(4, e_it->good);
-    EXPECT_EQ(4, (*n0_edg_it)->good);
-
-    //Now remove it frmo local_list.
-    (*n0_it->second).edges.local_list.erase(n0_edg_it);
-
-    //Now, reset master iterator, and see what is in same spot.
-    e_it= master_edge.end();
-    --e_it;
-    
-    //Actually, this should NOT change the size or elements in master!
-    EXPECT_EQ( (size_t)4 , master_edge.size() );
-    EXPECT_EQ( 4, e_it->good);
-
-    //Should change size in local list, and beginning.
-    EXPECT_EQ( (size_t)1, (*n0_it->second).edges.local_list.size() );
-    n0_edg_it = (*n0_it->second).edges.local_list.begin();
-    EXPECT_EQ( 2, (*n0_edg_it)->bad);
 
     
     //THE BELOW IS TRYING TO FIGURE OUT WHAT'S GOING ON. 

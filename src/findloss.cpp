@@ -60,7 +60,7 @@ int find_loss(edge_ptr& e) {
     //Not same. N2's edge neighbor is less. Since in sorted, increment to next edge in N2
     if( (*e->n1)->far_id(*n1_edg_it) > (*e->n2)->far_id(*n2_edg_it) ) {n2_edg_it++;continue;}
 
-    //If we didn't loop yet, we must have Same edge. Confirm.
+    //If we didn't loop yet, we must have Same neighbor. Confirm.
     assert((*e->n1)->far_id(*n1_edg_it) == (*e->n2)->far_id(*n2_edg_it) );
 
     //We have same edge. So now we calculate options lost.

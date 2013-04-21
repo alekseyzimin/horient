@@ -43,6 +43,51 @@ struct edge_base {
 
   //  double score() const { S f; return f(good, bad, good2, bad2); }
   double score() const { return score_function(good, bad, good2, bad2); }
+
+  //This does not actually destroy the merged edge. It must be destroyed after calling.
+  //Note: I don't know if this is actually generalized/templated nicely..or will break outside of this?
+  void merge(const edge_base& e) const{
+    //Update interior values.
+    good+= *e.good;
+    good2+= *e.good2;
+    bad+= *e.bad;
+    bad2+= *e.bad2;
+    merge_loss=-1;
+
+
+    //Because we have an edge_base / edge in... have to do this messier. 
+    //  Maybe we can just pass a pointer to the actual edge? not sure if
+    // guaranteed to be identical pointers as iterator would general.
+
+    // Find edge in local list to erase..
+    auto local_it = (*e.n1)->second.edges.local_list.begin(); //just for readability.
+    auto local_end= (*e.n1)->second.edges.local_list.end();
+
+    //Loop through edge_ptrs until we find the one that points to our passed in edge.
+    while(local_it != local_end){
+      if( *local_it == &e) {break;}
+      ++local_it;
+    }
+
+    //local_it should be an iterator to a pointer to same edge as passed in now. 
+    assert( (*local_it->n1)->id == *e.n1.id && (*local_it->n2)->id == *e.n2.id);
+    
+    (*e.n1)->second.edges.local_list.erase(local_it);
+
+    //Have to do all of above 2nd time for n2. Just to be careful!
+    local_it = (*e.n2)->second.edges.local_list.begin(); //just for readability.
+    local_end= (*e.n2)->second.edges.local_list.end();
+    
+    while(local_it != local_end){
+      if( *local_it == &e) {break;}
+      ++local_it;
+    }
+    assert( (*local_it->n1)->id == *e.n1.id && (*local_it->n2)->id == *e.n2.id);
+    (*e.n2)->second.edges.local_list.erase(local_it);
+    
+  }	  
+
+    
 };
 template<typename N>
 scoring_function edge_base<N>::score_function = diff_square;
