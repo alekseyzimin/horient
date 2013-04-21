@@ -24,62 +24,61 @@ TEST(pickflip, Small) {
   node_map_type master_node;
   readdata(master_edge, master_node, true, input);
 
-  node* picked;
-
-  //should return pointer to first node in master list 
-  // (these are reverse order of above)
+  // should return pointer to first node in master list (these are
+  // reverse order of above)
   auto it = master_edge.begin();
 
-  // Picks node to flip on edge  
-  picked=pick_flip(it);
+  { // Test 1st edge
+    // Picks node to flip on edge  
+    node* picked=pick_flip(it);
 
-  //This should pick up condition: n2_bad>n1_bad && n1diff == n2diff 
-  auto it2 = master_node.find("3");
+    // This should pick up condition: n2_bad>n1_bad && n1diff == n2diff
+    auto it2 = master_node.find("3");
 
-  //Checks to make sure we found the right node 
-  // to check out pick logic against
-  EXPECT_EQ((*it->n2)->id, (*it2->second).id ); 
-  
-  EXPECT_EQ( (*it2->second).id, (*picked)->id);
+    // Checks to make sure we found the right node to check out pick
+    // logic against
+    EXPECT_EQ((*it->n2)->id, (*it2->second).id ); 
+    EXPECT_EQ( (*it2->second).id, (*picked)->id);
+  }
 
-  it++; //Test the 2nd edge
-  it2= master_node.find("5");
+  { // Test 2nd edge
+    ++it;
+    auto it2= master_node.find("5");
 
-  //Checks to make sure we found the right node 
-  // to check out pick logic against
-  EXPECT_EQ( (*it->n2)->id, (*it2->second).id );
+    // Checks to make sure we found the right node to check out pick
+    // logic against
+    EXPECT_EQ( (*it->n2)->id, (*it2->second).id );
 
+    // This should pick up the condition: n1diff> n2diff && n1_good !=0
+    node* picked=pick_flip(it);
+    EXPECT_EQ((*it2->second).id, (*picked)->id);
+  }
 
-  //This should pick up the condition: n1diff> n2diff && n1_good !=0
-  picked=pick_flip(it);
-  EXPECT_EQ((*it2->second).id, (*picked)->id);
+  { // Test 3rd edge
+    ++it; //test the 3rd edge
+    auto it2=master_node.find("4");
 
-  it++; //test the 3rd edge
-  it2=master_node.find("4");
+    // Checks to make sure we found the right node to check out pick
+    // logic against
+    EXPECT_EQ((*it->n2)->id, (*it2->second).id ); 
 
-  //Checks to make sure we found the right node 
-  // to check out pick logic against
-  EXPECT_EQ((*it->n2)->id, (*it2->second).id ); 
+    // This should pick up the condition: 
+    //     n2_bad>n1_bad && n1_good == n2_good == 0
+    node* picked = pick_flip(it);
+    EXPECT_EQ( (*it2->second).id,(*picked)->id);
+  }
 
+  { // Test 6th edge
+    //This should default to picking the first node in the edge.
+    it++;it++;it++;//6th Edge: 5 3 0 11 0 0
+    auto it2=master_node.find("5" );
 
-  //This should pick up the condition: 
-  //     n2_bad>n1_bad && n1_good == n2_good == 0
-  picked=pick_flip(it);
-  EXPECT_EQ( (*it2->second).id,(*picked)->id);
+    //Checks to make sure we found the right node 
+    // to check out pick logic against
+    EXPECT_EQ((*it->n1)->id, (*it2->second).id); 
 
-  //This should default to picking the first node in the edge.
-  it++;it++;it++;//6th Edge: 5 3 0 11 0 0
-  it2=master_node.find("5" );
-
-  //Checks to make sure we found the right node 
-  // to check out pick logic against
-  EXPECT_EQ((*it->n1)->id, (*it2->second).id); 
-
-  picked=pick_flip(it);
-  
-
-  EXPECT_EQ( (*it2->second).id,(*picked)->id);
-
-  
+    node* picked=pick_flip(it);
+    EXPECT_EQ( (*it2->second).id,(*picked)->id);
+  }
 }
 }
