@@ -33,7 +33,7 @@ void flip_node(node* n0);
 //PRECONDITION: master_edge !empty
 //POSTCONDITION: edge_ptr returned. 
 //??POSTMAYBE: some edges have a merge-loss calculated.
-edge* findbestmerge(std::list<edge>& master_edge);
+edge_ptr findbestmerge(std::list<edge>& master_edge);
 
 //Function to find the loss for merging over a given edge
 //PRECONDITION: edge e exists, nodes connected exist, e->merge_loss == NULL 
