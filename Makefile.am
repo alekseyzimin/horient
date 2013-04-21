@@ -34,4 +34,5 @@ all_tests_SOURCES += unittests/test_disjoint_set.cc			\
                      unittests/test_edge.cc unittests/test_node.cc	\
                      unittests/test_read_data.cc src/readdata.cpp 	\
 		     src/findloss.cpp \
-			unittests/test_pickflip.cc src/pickflip.cpp 
+			unittests/test_pickflip.cc src/pickflip.cpp 	\
+			src/findbest.cpp
