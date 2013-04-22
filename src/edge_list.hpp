@@ -42,67 +42,17 @@ struct edge_base {
     return n1 < e.n1 || (!(e.n1 < n1) && n2 < e.n2);
   }
 
+  // Return node of edge not equal to n
+  N& far_node(const N& n) {
+    return n->id == n1->id ? n2 : n1;
+  }
+
+  N& local_node(const int id) {
+    return id == n1->id ? n1 : n2;
+  }
+
   //  double score() const { S f; return f(good, bad, good2, bad2); }
   double score() const { return score_function(good, bad, good2, bad2); }
-
-  //This does not actually destroy the merged edge. It must be destroyed after calling.
-  //Note: I don't know if this is actually generalized/templated nicely..or will break outside of this?
-  void merge(const edge_base& e) {
-    //Update interior values.
-    good+= e.good;
-    good2+= e.good2;
-    bad+= e.bad;
-    bad2+= e.bad2;
-    merge_loss=-1;
-
-
-    //If we pass in a edge_ptr we can use "comp_edge" ... alternatively, we could
-    // change "comp_edge" to actually compare edges, instead of pointers, then pass
-    // into it more derefenced things. Have to make those tiered changes,
-    // This would all be the cleaner approach. Works for now. Can clean up later.
-
-    //Because we have an edge_base / edge in... have to do this messier. 
-    //  Maybe we can just pass a pointer to the actual edge? not sure if
-    // guaranteed to be identical pointers as iterator would general.
-
-    // Find edge in local list to erase..
-    auto local_it = (*e.n1).value.edges.local_list.begin(); //just for readability.
-    auto local_end= (*e.n1).value.edges.local_list.end();
-
-    //Have to check id's because only place == or != defined! (for int's).
-    //Loop through edge_ptrs until we find the one that points to our passed in edge.
-    while(local_it != local_end){
-      if( (* (*local_it)->n1)->id != (*e.n1)->id ) {++local_it;continue;}
-      if( (* (*local_it)->n2)->id != (*e.n2)->id ) {++local_it;continue;}
-
-      break;
-    }
-
-    //local_it should be an iterator to a pointer to same edge as passed in now. 
-    assert( (    (* (*local_it)->n1)->id == (*e.n1)->id )  
-	    && ( (* (*local_it)->n2)->id == (*e.n2)->id ) ) ;
-    
-    (*e.n1).value.edges.local_list.erase(local_it);
-
-    //Have to do all of above 2nd time for n2. Just to be careful!
-    local_it = (*e.n2).value.edges.local_list.begin(); //just for readability.
-    local_end= (*e.n2).value.edges.local_list.end();
-
-    while(local_it != local_end){
-      if( (* (*local_it)->n1)->id != (*e.n1)->id ) {++local_it;continue;}
-      if( (* (*local_it)->n2)->id != (*e.n2)->id ) {++local_it;continue;}
-
-      break;
-    }
-    //local_it should be an iterator to a pointer to same edge as passed in now. 
-    assert( (    (* (*local_it)->n1)->id == (*e.n1)->id )  
-	    && ( (* (*local_it)->n2)->id == (*e.n2)->id ) ) ;
-
-    (*e.n2).value.edges.local_list.erase(local_it);
-    
-  }	  
-
-    
 };
 
 //Function to set if two edges are the same from pointers to them. (iterators)
@@ -133,7 +83,7 @@ struct sorted_edge_list {
     }
   };
 
-  static std::list<E>* master_list;
+  static std::list<E> master_list;
   std::set<edge_ptr, edge_comparator>  local_list;
 
 
@@ -142,5 +92,7 @@ struct sorted_edge_list {
   void add_edge(const edge_ptr& e) { local_list.insert(e); }
   void merge(sorted_edge_list& rhs) { }
 };
+template<typename E>
+std::list<E> sorted_edge_list<E>::master_list;
 
 #endif /* _EDGE_LIST_H_ */
