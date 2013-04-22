@@ -24,7 +24,7 @@
 
 void output_contig_orientation(std::ostream& out, node_map_type& master_node) {
   for(auto it = master_node.begin(); it != master_node.end(); ++it) {
-    out << it->second.id << " " << it->second.resolve_orientation() << "\n";
+    out << it->first << " " << it->second.resolve_orientation() << "\n";
   }
 }
 

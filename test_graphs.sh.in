@@ -18,7 +18,7 @@ orient_cmp() {
     cmp ${TEST}/${base}.ans test/${base}.sorted
 }
 
-# set -e
+set -e
 
 mkdir -p test
 orient_cmp basic
