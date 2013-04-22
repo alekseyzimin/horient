@@ -10,7 +10,7 @@ V_YAGGO = $(V_YAGGO_$(V))
 V_YAGGO_ = $(V_YAGGO_$(AM_DEFAULT_VERBOSITY))
 V_YAGGO_0 = @echo "  YAGGO " $@;
 .yaggo.hpp:
-	$(V_YAGGO)$(YAGGO) -o $@ $<
+	$(V_YAGGO)$(YAGGO) -l $(top_srcdir)/header-license -o $@ $<
 YAGGO_SOURCES = # Append all file to be built by yaggo
 
 ##############################
@@ -19,7 +19,7 @@ YAGGO_SOURCES = # Append all file to be built by yaggo
 bin_PROGRAMS = horient
 
 horient_SOURCES = src/horient.cc src/readdata.cpp
-noinst_HEADERS += src/horient.hpp
+noinst_HEADERS += src/horient.hpp src/edge_list.hpp src/node.hpp
 YAGGO_SOURCES += src/horient_cmdline.hpp
 
 ##############################
