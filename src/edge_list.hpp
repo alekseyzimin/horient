@@ -45,12 +45,16 @@ struct edge_base {
 
   // Return node of edge not equal to n
   N& far_node(const N& n) {
-    return n->id == n1->id ? n2 : n1;
+    return n.id == n1.id ? n2 : n1;
   }
 
-  N& local_node(const int id) {
-    return id == n1->id ? n1 : n2;
+  N& local_node(const N& n) {
+    return n.id == n1.id ? n1 : n2;
   }
+
+  // N& local_node(const int id) {
+  //   return id == n1->id ? n1 : n2;
+  // }
 
   //  double score() const { S f; return f(good, bad, good2, bad2); }
   double score() const { return score_function(good, bad, good2, bad2); }
@@ -58,21 +62,15 @@ struct edge_base {
 
 template<typename N>
 std::ostream& operator<<(std::ostream& o, const edge_base<N>& e) {
-  return o << "<id1:" << e.n1->id << " id2:" << e.n2->id
+  return o << "<id1:" << e.n1.id << " id2:" << e.n2.id
            << " good:" << e.good << " bad:" << e.bad << ">";
 }
 
 //Function to set if two edges are the same from pointers to them. (iterators)
 template<typename T>
 bool comp_edge(const T& x, const T& y) {
-  //std::cerr<<"x-n1-id: "<<x->n1->id<<" x-n2-id: "<<x->n2->id
-  //	   <<" y-n1-id: "<<y->n1->id<<" y-n2-id: "<<y->n2->id
-  //         << " " << (void*)&x << " " << (void*)&y << "\n";
-  //	   <<" memory: "<<x<<" "<<y<<"\n";
-  //std::cerr<<"(*x)->id "<<(*x).n1->id<<"\n";
-
-  return (( x->n1->id == y->n2->id ) && ( x->n2->id == y->n1->id ) ) ||
-    (( x->n2->id == y->n2->id ) && ( x->n1->id == y->n1->id ));
+  return (( x->n1.id == y->n2.id ) && ( x->n2.id == y->n1.id ) ) ||
+    (( x->n2.id == y->n2.id ) && ( x->n1.id == y->n1.id ));
 }
 
 
@@ -89,7 +87,7 @@ struct sorted_edge_list {
     int id;
     edge_comparator(int id_) : id(id_) { }
     inline int far_id(const edge_ptr& e) {
-     return (e->n1)->id == id ? (e->n2)->id : (e->n1)->id;
+      return e->n1.id == id ? e->n2.id : e->n1.id;
     }
     bool operator()(const edge_ptr& x, const edge_ptr& y) {
       return far_id(x) < far_id(y);

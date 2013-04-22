@@ -48,8 +48,8 @@ node& pick_flip(const edge_ptr& join_edge){
   // in edge(join_edge)
 
   //Sum up good and bad mate-pairs for all edges incident to Node 2 in edge(join_edge)
-  tie(n1_good, n1_bad) = sum_edges(join_edge->n1->edges.local_list, join_edge);
-  tie(n2_good, n2_bad) = sum_edges(join_edge->n2->edges.local_list, join_edge);
+  tie(n1_good, n1_bad) = sum_edges(join_edge->n1.edges.local_list, join_edge);
+  tie(n2_good, n2_bad) = sum_edges(join_edge->n2.edges.local_list, join_edge);
 
   //Decide if we should flip node 2
   int n1diff=n1_good-n1_bad;

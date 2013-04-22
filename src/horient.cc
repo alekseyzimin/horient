@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
   horient_cmdline args(argc, argv);
 
-  std::list<edge>& master_edge = node_info::sorted_edge_list_type::master_list;
+  std::list<edge>& master_edge = node::sorted_edge_list_type::master_list;
   node_map_type master_node;
 
   std::ifstream input(args.input_arg);

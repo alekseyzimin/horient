@@ -9,7 +9,7 @@
 namespace {
 class merge : public ::testing::Test {
 public:
-  merge() : master_edge(node_info::sorted_edge_list_type::master_list)
+  merge() : master_edge(node::sorted_edge_list_type::master_list)
   { }
 protected:
   virtual void SetUp() {
@@ -52,18 +52,18 @@ TEST_F(merge, fe_graph) {
     }
 
     std::cerr << "Local List receiver:\n";
-    for(auto it=tmp_ptr->n1->edges.local_list.begin();
-	it !=tmp_ptr->n1->edges.local_list.end();++it){
+    for(auto it=tmp_ptr->n1.edges.local_list.begin();
+	it !=tmp_ptr->n1.edges.local_list.end();++it){
       std::cerr<< **it <<"\n";
     } 
 
     std::cerr << "Local List sender:\n";
-    for(auto it=tmp_ptr->n2->edges.local_list.begin();
-	it !=tmp_ptr->n2->edges.local_list.end();++it){
+    for(auto it=tmp_ptr->n2.edges.local_list.begin();
+	it !=tmp_ptr->n2.edges.local_list.end();++it){
       std::cerr<< **it <<"\n";
     }
     //Merge "1" into "0"
-    tmp_ptr->n1->merge(tmp_ptr->n2);
+    tmp_ptr->n1.merge(tmp_ptr->n2);
 
     //Post condition expected:
     // edge: 0->1 gone. --> moved to interior.
@@ -78,10 +78,10 @@ TEST_F(merge, fe_graph) {
 
     //Test post conditions
     EXPECT_EQ( (size_t)2, master_edge.size());
-    EXPECT_EQ( (size_t)2, master_node.find("0")->second->edges.local_list.size());
-    EXPECT_EQ( (size_t)0, master_node.find("1")->second->edges.local_list.size());
+    EXPECT_EQ( (size_t)2, master_node.find("0")->second.edges.local_list.size());
+    EXPECT_EQ( (size_t)0, master_node.find("1")->second.edges.local_list.size());
 
-    EXPECT_EQ( 4, master_node.find("0")->second->int_good);
+    EXPECT_EQ( 4, master_node.find("0")->second.int_good);
     EXPECT_EQ( 3, master_edge.begin()->good);
     EXPECT_EQ( 0, master_edge.begin()->bad);
     EXPECT_EQ( 2, (++master_edge.begin())->good);
@@ -116,7 +116,7 @@ TEST_F(merge, fe_graph) {
     }
 
     //Merge "4" into "2"
-    tmp_ptr->n1->merge(tmp_ptr->n2);
+    tmp_ptr->n1.merge(tmp_ptr->n2);
 
     //Post condition expected:
     // edge: 2->4 gone. --> moved to interior.
@@ -130,9 +130,9 @@ TEST_F(merge, fe_graph) {
     
     //Check that all the sizes for lists of edges have changed correctly
     EXPECT_EQ( (size_t)4, master_edge.size());
-    EXPECT_EQ( (size_t)2, master_node.find("2")->second->edges.local_list.size());    
-    EXPECT_EQ( (size_t)2, master_node.find("1")->second->edges.local_list.size());
-    EXPECT_EQ( (size_t)0, master_node.find("4")->second->edges.local_list.size());
+    EXPECT_EQ( (size_t)2, master_node.find("2")->second.edges.local_list.size());    
+    EXPECT_EQ( (size_t)2, master_node.find("1")->second.edges.local_list.size());
+    EXPECT_EQ( (size_t)0, master_node.find("4")->second.edges.local_list.size());
  
     //Check that master_edge's edge is changes. && changed all the appropriate values
     tmp_ptr = master_edge.begin();   
@@ -141,12 +141,12 @@ TEST_F(merge, fe_graph) {
     EXPECT_EQ( -1, tmp_ptr->merge_loss);
     
     //Test id's correct
-    EXPECT_EQ( 1, tmp_ptr->n1->id);
-    EXPECT_EQ( 2, tmp_ptr->n2->id);
+    EXPECT_EQ( 1, tmp_ptr->n1.id);
+    EXPECT_EQ( 2, tmp_ptr->n2.id);
 
     //Test interior updates correctly
-    EXPECT_EQ( 5, master_node.find("2")->second->int_good);
-    EXPECT_EQ( 0, master_node.find("2")->second->int_bad);
+    EXPECT_EQ( 5, master_node.find("2")->second.int_good);
+    EXPECT_EQ( 0, master_node.find("2")->second.int_bad);
 
     tmp_ptr= master_edge.end();
     --tmp_ptr; //point to actual last (first) edge.
@@ -159,7 +159,7 @@ TEST_F(merge, fe_graph) {
     
     //Merge "0" into "2"
     //    std::cerr << "Edge merge: " << *tmp_ptr << "\n";
-    tmp_ptr->n2->merge(tmp_ptr->n1); //Should merge node "0" into node "2"
+    tmp_ptr->n2.merge(tmp_ptr->n1); //Should merge node "0" into node "2"
 
     //Post conditions expected:
     //  edge 0->2 gone, interior.
@@ -173,8 +173,8 @@ TEST_F(merge, fe_graph) {
     EXPECT_EQ( (size_t)2, master_edge.size());
     
     auto edg_it= master_edge.begin();
-    EXPECT_EQ( 2, edg_it->n1->id);
-    EXPECT_EQ( 3, edg_it->n2->id);
+    EXPECT_EQ( 2, edg_it->n1.id);
+    EXPECT_EQ( 3, edg_it->n2.id);
     
     
   }
@@ -213,11 +213,11 @@ TEST_F(merge, fe_graph) {
 
 //     //Check that it points to right edge.
 //     auto node_it=master_node.find("5");
-//     EXPECT_EQ(node_it->second->id, edge_it->n1->id );
+//     EXPECT_EQ(node_it->second.id, edge_it->n1.id );
 
 //     //Then best_merge should _also_ point to the same edge
 //     // if everything is working right.
-//     EXPECT_EQ( node_it->second->id, best_merge->n1->id );
+//     EXPECT_EQ( node_it->second.id, best_merge->n1.id );
 
 //   }
 
@@ -261,15 +261,15 @@ TEST_F(merge, fe_graph) {
 //     auto n3_it = master_node.find("3");
 
 //     //Iterator to first pointer to edge for node_3
-//     auto node3_first_edge_it = n3_it->second->edges.local_list.begin();
+//     auto node3_first_edge_it = n3_it->second.edges.local_list.begin();
 
 //     //Expect address of the edges pointed to are equal?
 //     EXPECT_EQ( &(*e_it), &(*(*node3_first_edge_it)));
 //     //Or are the bads equal then?
 //     EXPECT_EQ( e_it->bad, (*node3_first_edge_it)->bad);
 //     //And can we find it?
-//     auto tmp_it= n3_it->second->edges.local_list.begin(); //to get type
-//     tmp_it= n3_it->second->edges.local_list.find( e_it );
+//     auto tmp_it= n3_it->second.edges.local_list.begin(); //to get type
+//     tmp_it= n3_it->second.edges.local_list.find( e_it );
 //     EXPECT_EQ( tmp_it, node3_first_edge_it);
 
 //     //What happens when we erase an edge from a LOCAL_LIST to master?
@@ -332,15 +332,15 @@ TEST_F(merge, fe_graph) {
 //     auto n3_it = master_node.find("3");
 
 //     //Iterator to first pointer to edge for node_3
-//     auto node3_first_edge_it = n3_it->second->edges.local_list.begin();
+//     auto node3_first_edge_it = n3_it->second.edges.local_list.begin();
 
 //     //Expect address of the edges pointed to are equal?
 //     EXPECT_EQ( &(*e_it), &(*(*node3_first_edge_it)));
 //     //Or are the bads equal then?
 //     EXPECT_EQ( e_it->bad, (*node3_first_edge_it)->bad);
 //     //And can we find it?
-//     auto tmp_it= n3_it->second->edges.local_list.begin(); //to get type
-//     tmp_it= n3_it->second->edges.local_list.find( e_it );
+//     auto tmp_it= n3_it->second.edges.local_list.begin(); //to get type
+//     tmp_it= n3_it->second.edges.local_list.find( e_it );
 //     EXPECT_EQ( tmp_it, node3_first_edge_it);
 
 
@@ -353,14 +353,14 @@ TEST_F(merge, fe_graph) {
 //     EXPECT_EQ(3, (*node3_first_edge_it)->bad); //Succed if not erased?
 
 //     //The begin iterator should now point to the originally 2nd edge?
-//     node3_first_edge_it= n3_it->second->edges.local_list.begin();
+//     node3_first_edge_it= n3_it->second.edges.local_list.begin();
 
 //     //This expect FAILS. Meaning the local list begin does not
 //     // point to second edge...
 //     // EXPECT_EQ(5, (*node3_first_edge_it)->good);
 
 //     //This (failure) proves that local_list thinks it still has 2 elements?
-//     // EXPECT_EQ((size_t)1 , n3_it->second->edges.local_list.size());
+//     // EXPECT_EQ((size_t)1 , n3_it->second.edges.local_list.size());
 
 //     //Is master_edge list smaller? (YES)
 //     EXPECT_EQ( (size_t)4 , master_edge.size());

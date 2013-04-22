@@ -37,8 +37,8 @@ TEST(pickflip, Small) {
 
     // Checks to make sure we found the right node to check out pick
     // logic against
-    EXPECT_EQ(it->n2->id, it2->second->id ); 
-    EXPECT_EQ( it2->second->id, picked->id);
+    EXPECT_EQ(it->n2.id, it2->second.id ); 
+    EXPECT_EQ( it2->second.id, picked.id);
   }
 
   { // Test 2nd edge
@@ -47,11 +47,11 @@ TEST(pickflip, Small) {
 
     // Checks to make sure we found the right node to check out pick
     // logic against
-    EXPECT_EQ( it->n2->id, it2->second->id );
+    EXPECT_EQ( it->n2.id, it2->second.id );
 
     // This should pick up the condition: n1diff> n2diff && n1_good !=0
     node& picked=pick_flip(it);
-    EXPECT_EQ(it2->second->id, picked->id);
+    EXPECT_EQ(it2->second.id, picked.id);
   }
 
   { // Test 3rd edge
@@ -60,12 +60,12 @@ TEST(pickflip, Small) {
 
     // Checks to make sure we found the right node to check out pick
     // logic against
-    EXPECT_EQ(it->n2->id, it2->second->id ); 
+    EXPECT_EQ(it->n2.id, it2->second.id ); 
 
     // This should pick up the condition: 
     //     n2_bad>n1_bad && n1_good == n2_good == 0
     node& picked = pick_flip(it);
-    EXPECT_EQ( it2->second->id,picked->id);
+    EXPECT_EQ( it2->second.id,picked.id);
   }
 
   { // Test 6th edge
@@ -75,10 +75,10 @@ TEST(pickflip, Small) {
 
     //Checks to make sure we found the right node 
     // to check out pick logic against
-    EXPECT_EQ(it->n1->id, it2->second->id); 
+    EXPECT_EQ(it->n1.id, it2->second.id); 
 
     node& picked=pick_flip(it);
-    EXPECT_EQ( it2->second->id,picked->id);
+    EXPECT_EQ( it2->second.id,picked.id);
   }
 }
 }

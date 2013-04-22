@@ -6,6 +6,7 @@
 
 #include <list>
 #include <iostream>
+#include <limits>
 
 #include <horient.hpp>
 
@@ -24,7 +25,7 @@ edge_ptr findbestmerge(std::list<edge>& master_edge){
     // maximum possible edges in it.
     double avg_score=
       m_edg_it->score() /
-      ( m_edg_it->n1->size * m_edg_it->n2->size );
+      ( m_edg_it->n1.size * m_edg_it->n2.size );
 
     // We didn't find a new maximum, loop in for.
     if(avg_score < max_score){ continue;}

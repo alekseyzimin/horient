@@ -52,7 +52,7 @@ namespace {
     //auto node_it=master_node.begin();
     auto edg_it =master_edge.begin();
 
-    EXPECT_EQ(edg_it->n2->id, edg_it->far_node(edg_it->n1)->id);
+    EXPECT_EQ(edg_it->n2.id, edg_it->far_node(edg_it->n1).id);
     
   }
 
@@ -108,14 +108,14 @@ namespace {
   EXPECT_EQ(-1, it->merge_loss);
 
   //Also check that node orient is restore to original!
-  EXPECT_EQ( 1, (it->n1)->orient);
+  EXPECT_EQ( 1, it->n1.orient);
 
   //Find loss, which should include flip.
   EXPECT_EQ(4, find_loss(it) );
   EXPECT_EQ(4, it->merge_loss);
 
   //Check that orient doesn't leave changed.
-  EXPECT_EQ(1, (it->n1)->orient);
+  EXPECT_EQ(1, it->n1.orient);
 
   ++it; //EDGE 0 1 4 0 0 0
   EXPECT_EQ(-1, it->merge_loss);
@@ -192,11 +192,11 @@ namespace {
 
     //Check that it points to right edge.
     auto node_it=master_node.find("5");
-    EXPECT_EQ(node_it->second->id, edge_it->n1->id );
+    EXPECT_EQ(node_it->second.id, edge_it->n1.id );
 
     //Then best_merge should _also_ point to the same edge
     // if everything is working right.
-    EXPECT_EQ( node_it->second->id, best_merge->n1->id );
+    EXPECT_EQ( node_it->second.id, best_merge->n1.id );
 
   }
 
@@ -240,20 +240,20 @@ namespace {
     auto n3_it = master_node.find("3");
 
     //Iterator to first pointer to edge for node_3
-    auto node3_first_edge_it = n3_it->second->edges.local_list.begin();
+    auto node3_first_edge_it = n3_it->second.edges.local_list.begin();
 
     //Expect address of the edges pointed to are equal?
     EXPECT_EQ( &(*e_it), &(*(*node3_first_edge_it)));
     //Or are the bads equal then?
     EXPECT_EQ( e_it->bad, (*node3_first_edge_it)->bad);
     //And can we find it?
-    auto tmp_it= n3_it->second->edges.local_list.begin(); //to get type
-    tmp_it= n3_it->second->edges.local_list.find( e_it );
+    auto tmp_it= n3_it->second.edges.local_list.begin(); //to get type
+    tmp_it= n3_it->second.edges.local_list.find( e_it );
     EXPECT_EQ( tmp_it, node3_first_edge_it);
 
     //What happens when we erase an edge from a LOCAL_LIST to master?
     auto n0_it = master_node.find("0");
-    auto n0_edg_it = (*n0_it->second).edges.local_list.begin();
+    auto n0_edg_it = n0_it->second.edges.local_list.begin();
 
     //Check this is last edge in master list
     e_it= master_edge.end();
@@ -264,7 +264,7 @@ namespace {
     EXPECT_EQ(4, (*n0_edg_it)->good);
 
     //Now remove it frmo local_list.
-    (*n0_it->second).edges.local_list.erase(n0_edg_it);
+    n0_it->second.edges.local_list.erase(n0_edg_it);
 
     //Now, reset master iterator, and see what is in same spot.
     e_it= master_edge.end();
@@ -275,8 +275,8 @@ namespace {
     EXPECT_EQ( 4, e_it->good);
 
     //Should change size in local list, and beginning.
-    EXPECT_EQ( (size_t)1, (*n0_it->second).edges.local_list.size() );
-    n0_edg_it = (*n0_it->second).edges.local_list.begin();
+    EXPECT_EQ( (size_t)1, n0_it->second.edges.local_list.size() );
+    n0_edg_it = n0_it->second.edges.local_list.begin();
     EXPECT_EQ( 2, (*n0_edg_it)->bad);
   }
 
@@ -311,15 +311,15 @@ namespace {
     auto n3_it = master_node.find("3");
 
     //Iterator to first pointer to edge for node_3
-    auto node3_first_edge_it = n3_it->second->edges.local_list.begin();
+    auto node3_first_edge_it = n3_it->second.edges.local_list.begin();
 
     //Expect address of the edges pointed to are equal?
     EXPECT_EQ( &(*e_it), &(*(*node3_first_edge_it)));
     //Or are the bads equal then?
     EXPECT_EQ( e_it->bad, (*node3_first_edge_it)->bad);
     //And can we find it?
-    auto tmp_it= n3_it->second->edges.local_list.begin(); //to get type
-    tmp_it= n3_it->second->edges.local_list.find( e_it );
+    auto tmp_it= n3_it->second.edges.local_list.begin(); //to get type
+    tmp_it= n3_it->second.edges.local_list.find( e_it );
     EXPECT_EQ( tmp_it, node3_first_edge_it);
 
 
@@ -332,14 +332,14 @@ namespace {
     EXPECT_EQ(3, (*node3_first_edge_it)->bad); //Succed if not erased?
 
     //The begin iterator should now point to the originally 2nd edge?
-    node3_first_edge_it= n3_it->second->edges.local_list.begin();
+    node3_first_edge_it= n3_it->second.edges.local_list.begin();
 
     //This expect FAILS. Meaning the local list begin does not
     // point to second edge...
     // EXPECT_EQ(5, (*node3_first_edge_it)->good);
 
     //This (failure) proves that local_list thinks it still has 2 elements?
-    // EXPECT_EQ((size_t)1 , n3_it->second->edges.local_list.size());
+    // EXPECT_EQ((size_t)1 , n3_it->second.edges.local_list.size());
 
     //Is master_edge list smaller? (YES)
     EXPECT_EQ( (size_t)4 , master_edge.size());

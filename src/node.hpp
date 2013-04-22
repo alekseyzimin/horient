@@ -6,40 +6,29 @@
 #include <utility>   //for swap;
 #include <unordered_map>
 
-#include <disjoint_set.hpp>
 #include <edge_list.hpp>
 #include <iostream>
 
-struct node_info;
-typedef disjoint_set<node_info> node;
-
-std::ostream& operator<<(std::ostream& os, const node_info& n);
+struct node;
 std::ostream& operator<<(std::ostream& os, const node& n);
-//Function to actually merge two nodes. Does copying and calling of union.
-// void node_merge(node* n1, node* n2){
 
-//   (*n1)->merge_ni(n2);
-
-//   union_set(n1,n2);
-
-// }
-
-struct node_info {
+struct node {
   int id;
   int int_good, int_bad;
   int size;
   int orient; //Holds orientation relative to 'parent' .. parent is defined as the FIRST node which becomes the cannonical representative of this. 
+  // node* parent;
   typedef edge_base<node> edge_type;
   typedef sorted_edge_list<edge_type>::edge_ptr edge_ptr;
   typedef sorted_edge_list<edge_type> sorted_edge_list_type;
   sorted_edge_list_type edges;
 
-  node_info(int id_) : id(id_), int_good(0), int_bad(0), size(1), orient(1), edges(id_) { }
+  node(int id_) : id(id_), int_good(0), int_bad(0), size(1), orient(1), edges(id_) { }
   void add_edge(const edge_ptr& e) { edges.add_edge(e); }
 
   //function to return neighbor on edge
   int far_id(const edge_ptr& e) const {
-    return e->n1->id == id ? e->n2->id : e->n1->id;
+    return e->n1.id == id ? e->n2.id : e->n1.id;
   }
 
   //flips this node
@@ -68,11 +57,11 @@ struct node_info {
     edges.master_list.push_front(e);
     edge_ptr ne = edges.master_list.begin();
     add_edge(ne);
-    far->add_edge(ne);
+    far.add_edge(ne);
 
-    far->edges.local_list.erase(*n2_edg_it);
+    far.edges.local_list.erase(*n2_edg_it);
     edges.master_list.erase(*n2_edg_it);
-    n2_edg_it = n_old->edges.local_list.erase(n2_edg_it);
+    n2_edg_it = n_old.edges.local_list.erase(n2_edg_it);
   }
 
   template<typename Iterator>
@@ -85,11 +74,11 @@ struct node_info {
     (*n1_edg_it)->bad2       += (*n2_edg_it)->bad2;
     (*n1_edg_it)->merge_loss  = -1;
 
-    e2_far_node->edges.local_list.erase(*n2_edg_it);
+    e2_far_node.edges.local_list.erase(*n2_edg_it);
     edges.master_list.erase(*n2_edg_it);
-    e2_far_node->edges.local_list.insert(*n1_edg_it);
+    e2_far_node.edges.local_list.insert(*n1_edg_it);
 
-    n2_edg_it = n_old->edges.local_list.erase(n2_edg_it);
+    n2_edg_it = n_old.edges.local_list.erase(n2_edg_it);
   }
 
   //Function to merge: Assumption that we pass the CORRECT node which will become child. 
@@ -100,9 +89,14 @@ struct node_info {
     //Have to merge edges.
 
     //Update interior int's
-    size     += n_old->size; 
-    int_good += n_old->int_good; 
-    int_bad  += n_old->int_bad;
+    size     += n_old.size; 
+    int_good += n_old.int_good; 
+    int_bad  += n_old.int_bad;
+
+    //Keep track of relative orientation forest. Orientation in n_old
+    //becomes relative to its parent.
+    // n_old.parent = this;
+    // n_old.orient = (this->orient == n_old.orient) ? 1 : -1;
 
     //Cycle through all edges in both nodes, take one of three actions:
     // If edge between them, move interior. -- delete edge
@@ -115,12 +109,12 @@ struct node_info {
     // These should be iterator which dereference to an edge_ptr.
     //To reduce editing labels below... n1= self, n2= n_old.
     auto n1_edg_it  = edges.local_list.begin();
-    auto n2_edg_it  = n_old->edges.local_list.begin();
+    auto n2_edg_it  = n_old.edges.local_list.begin();
     auto n1_edg_end = edges.local_list.end();
-    auto n2_edg_end = n_old->edges.local_list.end();
+    auto n2_edg_end = n_old.edges.local_list.end();
 
-    //Local node (self) never changes... the other does!
-    node& e1_local_node = (*n1_edg_it)->local_node(this->id);
+    //Local node (self) never changes
+    node& e1_local_node = (*n1_edg_it)->local_node(*this);
 
     //Not for loop because we increment independently.
     // should loop through the two sorted edge lists interior to the two nodes.
@@ -132,13 +126,13 @@ struct node_info {
       std::cerr << "Check L-1 --E1--??" << **n1_edg_it <<"\n";
       std::cerr << "Check L-1 --E2--??" << **n2_edg_it <<"\n";
       //std::cerr<<"addr: "<< (void*) &(*n1_edg_it)<<" "<<(void*) &(*n2_edg_it)<<"\n";
-      //std::cerr << "stupid check --E1--: id1:"<< (*n1_edg_it)->n1->id<<" id2: "<<(*n1_edg_it)->n2->id<<"\n";
+      //std::cerr << "stupid check --E1--: id1:"<< (*n1_edg_it)->n1.id<<" id2: "<<(*n1_edg_it)->n2.id<<"\n";
 
 
       //Need these inside the loops, because we change 
       // the FAR node in e2 (*n2_edg_it) each time!
       node& e2_far_node = (*n2_edg_it)->far_node(n_old);
-      std::cerr<<"Far node -e2- ID: "<<e2_far_node->id<<std::endl;
+      std::cerr<<"Far node -e2- ID: "<<e2_far_node.id<<std::endl;
 
       //If edge is identical, it's the merge edge.
       // Move interior. Zero. Go to next loop
@@ -153,24 +147,24 @@ struct node_info {
         
         edges.master_list.erase(*n1_edg_it);
         n1_edg_it = edges.local_list.erase(n1_edg_it);
-        n2_edg_it = n_old->edges.local_list.erase(n2_edg_it);
+        n2_edg_it = n_old.edges.local_list.erase(n2_edg_it);
         continue;
       }
 
       //Check if on merging edge for iterator n1_edg_it, update it.
-      if( (*n1_edg_it)->far_node(e1_local_node)->id == n_old->id) {
+      if( (*n1_edg_it)->far_node(e1_local_node).id == n_old.id) {
 	std::cerr<<"Entered if-2\n";
           int_good+= (*n1_edg_it)->good;
           int_bad+=  (*n1_edg_it)->bad;
 
-          n_old->edges.local_list.erase(*n1_edg_it);
+          n_old.edges.local_list.erase(*n1_edg_it);
           edges.master_list.erase(*n1_edg_it);
           n1_edg_it = edges.local_list.erase(n1_edg_it);
           continue;
       }
       
       //Check if on merging edge for iterator n2_edg_it, update it.
-      if( e2_far_node->id == id) {
+      if( e2_far_node.id == id) {
 	std::cerr<<"Entered if-3 \n";
       
 	int_good+= (*n2_edg_it)->good;
@@ -178,7 +172,7 @@ struct node_info {
 	
 	edges.local_list.erase(*n2_edg_it);
 	edges.master_list.erase(*n2_edg_it);
-	n2_edg_it = n_old->edges.local_list.erase(n2_edg_it);
+	n2_edg_it = n_old.edges.local_list.erase(n2_edg_it);
 	continue;
 
       }
@@ -189,7 +183,7 @@ struct node_info {
       //We will increment to next edge in N2, since sorted.
       // But that means we also need to move this edge to N1.
   
-      if( far_id(*n1_edg_it) > e2_far_node->id) {
+      if( far_id(*n1_edg_it) > e2_far_node.id) {
 	std::cerr<<"Entered if-4\n";
         merge_n2_less(n_old, e1_local_node, n2_edg_it);
         continue;
@@ -197,7 +191,7 @@ struct node_info {
 
       //Not same neighbor, N1's edge neighbor is less. Since sorted,
       // increment N1. Reset merge_loss and go to next edge.
-      if( far_id(*n1_edg_it) < n_old->far_id(*n2_edg_it) ) {
+      if( far_id(*n1_edg_it) < n_old.far_id(*n2_edg_it) ) {
 	std::cerr<<"Entered if-5 \n";
         (*n1_edg_it)->merge_loss = -1;
         ++n1_edg_it;
@@ -205,7 +199,7 @@ struct node_info {
       }
 
       //If we didn't loop yet, we must have Same neighbor. Confirm.
-      assert( far_id(*n1_edg_it) == n_old->far_id(*n2_edg_it) );
+      assert( far_id(*n1_edg_it) == n_old.far_id(*n2_edg_it) );
 
       std::cerr<<"Entered past last if\n";
       merge_same_neighbor(n_old, n1_edg_it, n2_edg_it);
@@ -230,15 +224,10 @@ struct node_info {
   }
 };
 
-inline std::ostream& operator<<(std::ostream& os, const node_info& n) {
+inline std::ostream& operator<<(std::ostream& os, const node& n) {
   return os << "<id:" << n.id << " good:" << n.int_good << " bad:" << n.int_bad
             << " size:" << n.size << " edges_size:" << n.edges.local_list.size() << ">";
 }
-
-inline std::ostream& operator<<(std::ostream& os, const node& n) {
-  return os << n.value;
-}
-
 
 typedef std::unordered_map<std::string, node> node_map_type;
 

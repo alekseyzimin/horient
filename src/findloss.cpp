@@ -35,16 +35,16 @@ int find_loss(edge_ptr& e) {
   // will be far more efficient, but messier code.
 
   // We have initially implemented a flip then flip back model.
-  if(node_to_flip){(*node_to_flip)->flip_node();}
+  if(node_to_flip){ node_to_flip->flip_node(); }
 
   // Iterate over internal edge lists to nodes connected to edge (e).
   // When find edge pointing to same neighbor, adjust loss-count
 
   // These should be iterator which dereference to an edge_ptr.
-  auto n1_edg_it = e->n1->edges.local_list.begin();
-  auto n2_edg_it = e->n2->edges.local_list.begin();
-  auto n1_edg_end = e->n1->edges.local_list.end();
-  auto n2_edg_end = e->n2->edges.local_list.end();
+  auto n1_edg_it = e->n1.edges.local_list.begin();
+  auto n2_edg_it = e->n2.edges.local_list.begin();
+  auto n1_edg_end = e->n1.edges.local_list.end();
+  auto n2_edg_end = e->n2.edges.local_list.end();
 
   //Not for loop because we increment independently.
   // should loop through the two sorted edge lists interior to the two nodes.
@@ -56,12 +56,12 @@ int find_loss(edge_ptr& e) {
     //Check if nodes point to different edges.
 
     //Not same. N1's edge neighbor is less. Since in sorted, increment to next edge in N1
-    if( e->n1->far_id(*n1_edg_it) < e->n2->far_id(*n2_edg_it) ) {n1_edg_it++;continue;}
+    if( e->n1.far_id(*n1_edg_it) < e->n2.far_id(*n2_edg_it) ) { n1_edg_it++; continue; }
     //Not same. N2's edge neighbor is less. Since in sorted, increment to next edge in N2
-    if( e->n1->far_id(*n1_edg_it) > e->n2->far_id(*n2_edg_it) ) {n2_edg_it++;continue;}
+    if( e->n1.far_id(*n1_edg_it) > e->n2.far_id(*n2_edg_it) ) { n2_edg_it++; continue; }
 
     //If we didn't loop yet, we must have Same edge. Confirm.
-    assert(e->n1->far_id(*n1_edg_it) == e->n2->far_id(*n2_edg_it) );
+    assert(e->n1.far_id(*n1_edg_it) == e->n2.far_id(*n2_edg_it) );
 
     //We have same edge. So now we calculate options lost.
     int diff_n1_edg= (*n1_edg_it)->good - (*n1_edg_it)->bad;
@@ -81,7 +81,7 @@ int find_loss(edge_ptr& e) {
   }
 
   //Before returning, we have to unflip the node, if we flipped one.
-  if(node_to_flip) { (*node_to_flip)->flip_node();}
+  if(node_to_flip) { node_to_flip->flip_node();}
 
   //Set the merge_loss in the edge we computed for.
   e->merge_loss = loss_cnt;
