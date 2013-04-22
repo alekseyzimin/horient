@@ -1,5 +1,5 @@
 AC_PREREQ([2.63])
-AC_INIT([horient], [0.0.1], [krbschmitt@gmail.com])
+AC_INIT([horient], [0.0.2], [krbschmitt@gmail.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([src/horient.hpp]) 

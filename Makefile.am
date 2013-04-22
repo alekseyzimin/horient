@@ -46,3 +46,14 @@ TESTS += test_graphs.sh
 test_graphs.sh: test_graphs.sh.in Makefile
 	sed -e 's|[@]top_srcdir[@]|$(top_srcdir)|g' < $< > $@
 	chmod +x $@
+EXTRA_DIST = test_graphs.sh.in test/Bac2ft0.07sp0.1.4.tally		\
+             test/Bac2ft0sp0.05.5.tally test/Bac2ft0sp0.15.5.tally	\
+             test/Bac2ft0sp0.1.5.tally test/basic2.tally		\
+             test/basic.tally test/Bac2ft0.07sp0.1.4.tally		\
+             test/Bac2ft0sp0.05.5.tally test/Bac2ft0sp0.15.5.tally	\
+             test/Bac2ft0sp0.1.5.tally test/basic2.tally		\
+             test/basic.tally test/Bac2ft0.07sp0.1.4.ans		\
+             test/Bac2ft0sp0.05.5.ans test/Bac2ft0sp0.15.5.ans		\
+             test/Bac2ft0sp0.1.5.ans test/basic2.ans test/basic.ans
+clean-local:
+	-rm -rf test test_graphs.sh
