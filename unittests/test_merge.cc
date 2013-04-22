@@ -43,25 +43,26 @@ TEST_F(merge, fe_graph) {
     //confirm correct pointing.
     EXPECT_EQ(4, tmp_ptr->good);
 
-    std::cerr<< "Merging on edge: "<< *tmp_ptr<<"\n";
-    std::cerr<< "Node sent into merge: "<< tmp_ptr->n2<<"\n";
+    // std::cerr<< "Merging on edge: "<< *tmp_ptr<<"\n";
+    // std::cerr<< "Node sent into merge: "<< tmp_ptr->n2<<"\n";
     
-    std::cerr << "Before merge:\n";
-    for(auto it=master_edge.begin();it !=master_edge.end();++it){
-      std::cerr<< *it <<"\n";
-    }
+    // std::cerr << "Before merge:\n";
+    // for(auto it=master_edge.begin();it !=master_edge.end();++it){
+    //   std::cerr<< *it <<"\n";
+    // }
 
-    std::cerr << "Local List receiver:\n";
-    for(auto it=tmp_ptr->n1->edges.local_list.begin();
-	it !=tmp_ptr->n1->edges.local_list.end();++it){
-      std::cerr<< **it <<"\n";
-    } 
+    // std::cerr << "Local List receiver:\n";
+    // for(auto it=tmp_ptr->n1->edges.local_list.begin();
+    // 	it !=tmp_ptr->n1->edges.local_list.end();++it){
+    //   std::cerr<< **it <<"\n";
+    // } 
 
-    std::cerr << "Local List sender:\n";
-    for(auto it=tmp_ptr->n2->edges.local_list.begin();
-	it !=tmp_ptr->n2->edges.local_list.end();++it){
-      std::cerr<< **it <<"\n";
-    }
+    // std::cerr << "Local List sender:\n";
+    // for(auto it=tmp_ptr->n2->edges.local_list.begin();
+    // 	it !=tmp_ptr->n2->edges.local_list.end();++it){
+    //   std::cerr<< **it <<"\n";
+    // }
+
     //Merge "1" into "0"
     tmp_ptr->n1->merge(tmp_ptr->n2);
 
@@ -70,10 +71,10 @@ TEST_F(merge, fe_graph) {
     //edges from 1 are in or merged into 0
     //merge loss reset.
 
-    std::cerr << "After merge:\n";
-    for(auto it=master_edge.begin();it !=master_edge.end();++it){
-      std::cerr<< *it <<"\n";
-    }
+    // std::cerr << "After merge:\n";
+    // for(auto it=master_edge.begin();it !=master_edge.end();++it){
+    //   std::cerr<< *it <<"\n";
+    // }
     
 
     //Test post conditions
@@ -86,6 +87,52 @@ TEST_F(merge, fe_graph) {
     EXPECT_EQ( 0, master_edge.begin()->bad);
     EXPECT_EQ( 2, (++master_edge.begin())->good);
     EXPECT_EQ( 3, (++master_edge.begin())->bad);
+  }
+
+
+  TEST_F(merge, f2_graph){
+    //This should test merging with the merge edge appearing 
+    //ONLY on n2_edg_it first... i.e. third loop in node's merge function.
+
+    const std::string content("0 1 3 5 0 0\n"
+			      "2 3 4 0 0 0\n"
+			      "1 3 2 3 0 0\n"
+			     );
+
+    read_example(content);
+    edge_ptr tmp_ptr=master_edge.begin();
+
+    //Check pointer to edge i want to merge on:
+    EXPECT_EQ(2, tmp_ptr->good);
+
+    // std::cerr<< "Receiver: "<<tmp_ptr->n1<<"\n";
+    // std::cerr << "Local List receiver:\n";
+    // for(auto it=tmp_ptr->n1->edges.local_list.begin();
+    // 	it !=tmp_ptr->n1->edges.local_list.end();++it){
+    //   std::cerr<< **it <<"\n";
+    // } 
+
+    // std::cerr<<"Sender: "<<tmp_ptr->n2<<"\n";
+    // std::cerr << "Local List sender:\n";
+    // for(auto it=tmp_ptr->n2->edges.local_list.begin();
+    // 	it !=tmp_ptr->n2->edges.local_list.end();++it){
+    //   std::cerr<< **it <<"\n";
+    // }
+
+    //Merge "3" into "1"
+    tmp_ptr->n1->merge(tmp_ptr->n2);
+
+   //Test post conditions
+    EXPECT_EQ( (size_t)2, master_edge.size());
+    EXPECT_EQ( (size_t)2, master_node.find("1")->second->edges.local_list.size());
+    EXPECT_EQ( (size_t)0, master_node.find("3")->second->edges.local_list.size());
+
+    EXPECT_EQ( 2, master_node.find("1")->second->int_good);
+    EXPECT_EQ( 4, master_edge.begin()->good);
+    EXPECT_EQ( 0, master_edge.begin()->bad);
+    EXPECT_EQ( 3, (++master_edge.begin())->good);
+    EXPECT_EQ( 5, (++master_edge.begin())->bad);
+
   }
 
 
