@@ -55,6 +55,12 @@ struct edge_base {
   double score() const { return score_function(good, bad, good2, bad2); }
 };
 
+template<typename N>
+std::ostream& operator<<(std::ostream& o, const edge_base<N>& e) {
+  return o << "<id1:" << e.n1->id << " id2:" << e.n2->id
+           << " good:" << e.good << " bad:" << e.bad << ">";
+}
+
 //Function to set if two edges are the same from pointers to them. (iterators)
 template<typename T>
 bool comp_edge(const T& x, const T& y) {
