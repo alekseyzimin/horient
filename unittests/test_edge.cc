@@ -36,6 +36,27 @@ namespace {
     
   }
 
+  TEST(far_node, simple){
+  
+    const std::string content("1 2 0 3 0 0\n");
+
+    std::istringstream input(content);
+    ASSERT_TRUE(input.good());
+
+    std::list<edge> master_edge;
+    node_map_type master_node;
+    readdata(master_edge, master_node, true, input);
+
+    EXPECT_EQ( (size_t)2,master_node.size() );  
+
+    //auto node_it=master_node.begin();
+    auto edg_it =master_edge.begin();
+
+    EXPECT_EQ(edg_it->n2->id, edg_it->far_node(edg_it->n1)->id);
+    
+  }
+
+
   TEST(Find_loss, Simple){
     //In find_loss the 3 edges tested should test the conditions in
     // line:

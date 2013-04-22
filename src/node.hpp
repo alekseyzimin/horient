@@ -8,6 +8,7 @@
 
 #include <disjoint_set.hpp>
 #include <edge_list.hpp>
+#include <iostream>
 
 struct node_info;
 typedef disjoint_set<node_info> node;
@@ -81,6 +82,8 @@ struct node_info {
     //Not for loop because we increment independently.
     // should loop through the two sorted edge lists interior to the two nodes.
     while(n1_edg_it != n1_edg_end && n2_edg_it != n2_edg_end) {
+
+      std::cout<<"looping in while\n";
       //If edge is identical, it's the merge edge.
       // Move interior. Zero. Go to next loop
       if( comp_edge(*n1_edg_it, *n2_edg_it) ){
@@ -100,10 +103,14 @@ struct node_info {
       //Since we are getting rid of N2/old... we just go to next edge in N1
       if( far_id(*n1_edg_it) < n_old->far_id(*n2_edg_it) ) {++n1_edg_it;continue;}
 
+      std::cout<<"early loop\n";
+
       node& e1_local_node = (*n1_edg_it)->local_node(this->id);
       //Not same. N2's edge neighbor is less. We will increment to next edge in N2, since sorted.
       // But that means we also need to move this edge to N1.
       node& e2_far_node = (*n2_edg_it)->far_node(n_old);
+
+
       if( far_id(*n1_edg_it) > e2_far_node->id) {
         edge_type e(e1_local_node, e2_far_node,
                     (*n2_edg_it)->good, (*n2_edg_it)->bad,
@@ -119,6 +126,8 @@ struct node_info {
         continue;
       }
 
+      std::cout<<"mid loop\n";
+
       //If we didn't loop yet, we must have Same neighbor. Confirm.
       assert( far_id(*n1_edg_it) == n_old->far_id(*n2_edg_it) );
 
@@ -129,6 +138,8 @@ struct node_info {
       (*n1_edg_it)->bad        += (*n2_edg_it)->bad;
       (*n1_edg_it)->bad2       += (*n2_edg_it)->bad2;
       (*n1_edg_it)->merge_loss  = -1;
+
+      std::cout<<"late loop \n";
 
       edges.master_list.erase(*n2_edg_it);
       e2_far_node->edges.local_list.erase(n2_edg_it);
