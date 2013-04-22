@@ -16,14 +16,21 @@ struct node {
   int id;
   int int_good, int_bad;
   int size;
-  int orient; //Holds orientation relative to 'parent' .. parent is defined as the FIRST node which becomes the cannonical representative of this. 
-  // node* parent;
+  // Hold orientation (1 or -1). If parent == 0, it is absolute,
+  // otherwise it is relative to parent.
+  int orient;
+  node* parent;
   typedef edge_base<node> edge_type;
   typedef sorted_edge_list<edge_type>::edge_ptr edge_ptr;
   typedef sorted_edge_list<edge_type> sorted_edge_list_type;
   sorted_edge_list_type edges;
 
-  node(int id_) : id(id_), int_good(0), int_bad(0), size(1), orient(1), edges(id_) { }
+  node(int id_) : 
+    id(id_), int_good(0), int_bad(0), size(1), 
+    orient(1), parent(0),
+    edges(id_)
+  { }
+
   void add_edge(const edge_ptr& e) { edges.add_edge(e); }
 
   //function to return neighbor on edge
@@ -33,14 +40,26 @@ struct node {
 
   //flips this node
   void flip_node(){
-    orient*=-1; //Easy part!
-    
+    orient *= -1; //Easy part!
+
     //Now, iterate through all the edges, and swap their good-bad.
     for(auto edge_it=edges.local_list.begin(); edge_it != edges.local_list.end(); edge_it++){
       std::swap( (*edge_it)->good, (*edge_it)->bad );
       std::swap( (*edge_it)->good2, (*edge_it)->bad2);
     }
+  }
 
+  // Traverse the tree upward to the root. Compute the absolute
+  // orientation of the current node and all the nodes traversed to
+  // the root. The nodes are disconnected from their parent.
+  //
+  // This is recursive but not tail recursive. It could potentially
+  // blow up the stack.
+  int resolve_orientation() {
+    if(!parent) return orient;
+    orient *= parent->resolve_orientation();
+    parent  = 0;
+    return orient;
   }
 
   template<typename Iterator>
@@ -95,8 +114,8 @@ struct node {
 
     //Keep track of relative orientation forest. Orientation in n_old
     //becomes relative to its parent.
-    // n_old.parent = this;
-    // n_old.orient = (this->orient == n_old.orient) ? 1 : -1;
+    n_old.parent = this;
+    n_old.orient = (this->orient == n_old.orient) ? 1 : -1;
 
     //Cycle through all edges in both nodes, take one of three actions:
     // If edge between them, move interior. -- delete edge
@@ -119,29 +138,16 @@ struct node {
     //Not for loop because we increment independently.
     // should loop through the two sorted edge lists interior to the two nodes.
     while( n1_edg_it != n1_edg_end && n2_edg_it != n2_edg_end ) {
-
-      std::cerr<<"Entered loop 1 \n";
-      //std::cerr << "Check L-1 --E1--" << *n1_edg_it <<"\n";
-      //std::cerr << "Check L-1 --E2--" << *n2_edg_it <<"\n";
-      std::cerr << "Check L-1 --E1--??" << **n1_edg_it <<"\n";
-      std::cerr << "Check L-1 --E2--??" << **n2_edg_it <<"\n";
-      //std::cerr<<"addr: "<< (void*) &(*n1_edg_it)<<" "<<(void*) &(*n2_edg_it)<<"\n";
-      //std::cerr << "stupid check --E1--: id1:"<< (*n1_edg_it)->n1.id<<" id2: "<<(*n1_edg_it)->n2.id<<"\n";
-
-
       //Need these inside the loops, because we change 
       // the FAR node in e2 (*n2_edg_it) each time!
       node& e2_far_node = (*n2_edg_it)->far_node(n_old);
-      std::cerr<<"Far node -e2- ID: "<<e2_far_node.id<<std::endl;
 
       //If edge is identical, it's the merge edge.
       // Move interior. Zero. Go to next loop
 
       //Check if one merging edge for both iterators. If so, change both
 
-      //std::cerr<<"addr: "<< (void*) &(*n1_edg_it)<<" "<<(void*) &(*n2_edg_it)<<"\n";
       if( comp_edge(*n1_edg_it, *n2_edg_it) ){
-	std::cerr<<"Entered if-1 \n";
         int_good+= (*n1_edg_it)->good;
         int_bad+=  (*n1_edg_it)->bad;
         
@@ -153,7 +159,6 @@ struct node {
 
       //Check if on merging edge for iterator n1_edg_it, update it.
       if( (*n1_edg_it)->far_node(e1_local_node).id == n_old.id) {
-	std::cerr<<"Entered if-2\n";
           int_good+= (*n1_edg_it)->good;
           int_bad+=  (*n1_edg_it)->bad;
 
@@ -165,8 +170,6 @@ struct node {
       
       //Check if on merging edge for iterator n2_edg_it, update it.
       if( e2_far_node.id == id) {
-	std::cerr<<"Entered if-3 \n";
-      
 	int_good+= (*n2_edg_it)->good;
 	int_bad+=  (*n2_edg_it)->bad;
 	
@@ -184,7 +187,6 @@ struct node {
       // But that means we also need to move this edge to N1.
   
       if( far_id(*n1_edg_it) > e2_far_node.id) {
-	std::cerr<<"Entered if-4\n";
         merge_n2_less(n_old, e1_local_node, n2_edg_it);
         continue;
       }
@@ -192,7 +194,6 @@ struct node {
       //Not same neighbor, N1's edge neighbor is less. Since sorted,
       // increment N1. Reset merge_loss and go to next edge.
       if( far_id(*n1_edg_it) < n_old.far_id(*n2_edg_it) ) {
-	std::cerr<<"Entered if-5 \n";
         (*n1_edg_it)->merge_loss = -1;
         ++n1_edg_it;
         continue;
@@ -201,7 +202,6 @@ struct node {
       //If we didn't loop yet, we must have Same neighbor. Confirm.
       assert( far_id(*n1_edg_it) == n_old.far_id(*n2_edg_it) );
 
-      std::cerr<<"Entered past last if\n";
       merge_same_neighbor(n_old, n1_edg_it, n2_edg_it);
 
       //Increment one iterator.
@@ -210,14 +210,10 @@ struct node {
 
     // Drain remaining iterator, either n1_edg_it or n2_edg_it
     while(n1_edg_it != n1_edg_end) {
-      std::cerr<<"Entered loop 2\n";
-      std::cerr << "Check L-2 " << **n1_edg_it <<"\n";
       (*n1_edg_it)->merge_loss = -1;
       ++n1_edg_it;
     }
     while(n2_edg_it != n2_edg_end) {
-      std::cerr<<"Entered loop 3 \n";
-      std::cerr << "Check L-3 " << **n2_edg_it <<"\n";
       merge_n2_less(n_old, e1_local_node, n2_edg_it);
       //      ++n2_edg_it;
     }
