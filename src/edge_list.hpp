@@ -3,6 +3,7 @@
 
 #include <list>
 #include <set>
+#include <iostream>
 
 typedef double (*scoring_function)(int g, int b, int g2, int b2);
 
@@ -63,7 +64,12 @@ std::ostream& operator<<(std::ostream& o, const edge_base<N>& e) {
 
 //Function to set if two edges are the same from pointers to them. (iterators)
 template<typename T>
-bool comp_edge(const T& x, const T& y) {
+bool comp_edge(const T& x,const T& y) {
+  std::cerr<<"x-n1-id: "<<x->n1->id<<" x-n2-id: "<<x->n2->id
+	   <<" y-n1-id: "<<y->n1->id<<" y-n2-id: "<<y->n2->id<<"\n";
+  //	   <<" memory: "<<x<<" "<<y<<"\n";
+  //std::cerr<<"(*x)->id "<<(*x).n1->id<<"\n";
+
   return (( x->n1->id == y->n2->id ) && ( x->n2->id == y->n1->id ) ) ||
     (( x->n2->id == y->n2->id ) && ( x->n1->id == y->n1->id ));
 }

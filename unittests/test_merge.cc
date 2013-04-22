@@ -8,10 +8,17 @@
 
 namespace {
 
+<<<<<<< Updated upstream
 
 TEST(merge, fe_graph) {
     //This should test merging when edge is first on both nodes.
    const std::string content("0 1 4 0 0 0\n"
+=======
+  TEST(merge, fe_graph) {
+    //This should test merging when edge is first on both nodes.
+
+ const std::string content("0 1 4 0 0 0\n"
+>>>>>>> Stashed changes
 			   "1 2 3 0 0 0\n"
 			   "0 3 2 1 0 0\n"
 			      );
@@ -21,6 +28,7 @@ TEST(merge, fe_graph) {
     node_map_type master_node;
     readdata(master_edge, master_node, true, input);
   
+<<<<<<< Updated upstream
 }
 //     edge_ptr tmp_ptr=master_edge.end();
 //     --tmp_ptr; //point to edge 0 1 4 0 0 0
@@ -73,6 +81,58 @@ TEST(merge, fe_graph) {
 //   }
 
 
+=======
+    edge_ptr tmp_ptr=master_edge.end();
+    --tmp_ptr; //point to edge 0 1 4 0 0 0
+
+    //confirm correct pointing.
+    EXPECT_EQ(4, tmp_ptr->good);
+
+    std::cerr<< "Merging on edge: "<< *tmp_ptr<<"\n";
+    std::cerr<< "Node sent into merge: "<< tmp_ptr->n2<<"\n";
+    
+    std::cerr << "Before merge:\n";
+    for(auto it=master_edge.begin();it !=master_edge.end();++it){
+      std::cerr<< *it <<"\n";
+    }
+
+    std::cerr << "Local List receiver:\n";
+    for(auto it=tmp_ptr->n1->edges.local_list.begin();
+	it !=tmp_ptr->n1->edges.local_list.end();++it){
+      std::cerr<< **it <<"\n";
+    } 
+
+    std::cerr << "Local List sender:\n";
+    for(auto it=tmp_ptr->n2->edges.local_list.begin();
+	it !=tmp_ptr->n2->edges.local_list.end();++it){
+      std::cerr<< **it <<"\n";
+    }
+    //Merge "0" into "1"
+    tmp_ptr->n1->merge(tmp_ptr->n2);
+
+    //Post condition expected:
+    // edge: 0->1 gone. --> moved to interior.
+    //edges from 1 are in or merged into 0
+    //merge loss reset.
+
+    std::cerr << "After merge:\n";
+    for(auto it=master_edge.begin();it !=master_edge.end();++it){
+      std::cerr<< *it <<"\n";
+    }
+    
+
+    //Test post conditions
+    EXPECT_EQ( (size_t)2, master_edge.size());
+    EXPECT_EQ( (size_t)2, master_node.find("0")->second->edges.local_list.size());
+    EXPECT_EQ( (size_t)0, master_node.find("1")->second->edges.local_list.size());
+
+    EXPECT_EQ( 4, master_node.find("0")->second->int_good);
+    EXPECT_EQ( 2, master_edge.begin()->good);
+    EXPECT_EQ( 2, master_edge.begin()->bad);
+    EXPECT_EQ( 3, (++master_edge.begin())->good);
+  }
+    
+>>>>>>> Stashed changes
 
   TEST(merge, pf_graph1){
     //Tests on 4-node demonstration/example error graph 

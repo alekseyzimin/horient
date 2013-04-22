@@ -119,18 +119,33 @@ struct node_info {
     auto n1_edg_end = edges.local_list.end();
     auto n2_edg_end = n_old->edges.local_list.end();
 
+    //Local node (self) never changes... the other does!
     node& e1_local_node = (*n1_edg_it)->local_node(this->id);
     node& e2_far_node = (*n2_edg_it)->far_node(n_old);
 
     //Not for loop because we increment independently.
     // should loop through the two sorted edge lists interior to the two nodes.
     while( n1_edg_it != n1_edg_end && n2_edg_it != n2_edg_end ) {
+
+      std::cerr<<"Entered loop 1 \n";
+      //std::cerr << "Check L-1 --E1--" << *n1_edg_it <<"\n";
+      //std::cerr << "Check L-1 --E2--" << *n2_edg_it <<"\n";
+      std::cerr << "Check L-1 --E1--??" << **n1_edg_it <<"\n";
+      std::cerr << "Check L-1 --E2--??" << **n2_edg_it <<"\n";
+      std::cerr << "stupid check --E1--: id1:"<< (*n1_edg_it)->n1->id<<" id2: "<<(*n1_edg_it)->n2->id<<"\n";
+
+
+      //Need these inside the loops, because we change 
+      // the FAR node in e2 (*n2_edg_it) each time!
+      e2_far_node = (*n2_edg_it)->far_node(n_old);
+      std::cerr<<"Far node -e2- ID: "<<e2_far_node->id<<std::endl;
+
       //If edge is identical, it's the merge edge.
       // Move interior. Zero. Go to next loop
 
       //Check if one merging edge for both iterators. If so, change both
       if( comp_edge(*n1_edg_it, *n2_edg_it) ){
-        //        std::cerr<<"Entered if for equal edges \n";
+	std::cerr<<"Entered if-1 \n";
         int_good+= (*n1_edg_it)->good;
         int_bad+=  (*n1_edg_it)->bad;
         
@@ -142,6 +157,7 @@ struct node_info {
 
       //Check if on merging edge for iterator n1_edg_it, update it.
       if( (*n1_edg_it)->far_node(e1_local_node)->id == n_old->id) {
+	std::cerr<<"Entered if-2\n";
           int_good+= (*n1_edg_it)->good;
           int_bad+=  (*n1_edg_it)->bad;
 
@@ -153,13 +169,15 @@ struct node_info {
       
       //Check if on merging edge for iterator n2_edg_it, update it.
       if( e2_far_node->id == id) {
-          int_good+= (*n2_edg_it)->good;
-          int_bad+=  (*n2_edg_it)->bad;
-
-          edges.local_list.erase(*n2_edg_it);
-          edges.master_list.erase(*n2_edg_it);
-          n2_edg_it = n_old->edges.local_list.erase(n2_edg_it);
-          continue;
+	std::cerr<<"Entered if-3 \n";
+      
+	int_good+= (*n2_edg_it)->good;
+	int_bad+=  (*n2_edg_it)->bad;
+	
+	edges.local_list.erase(*n2_edg_it);
+	edges.master_list.erase(*n2_edg_it);
+	n2_edg_it = n_old->edges.local_list.erase(n2_edg_it);
+	continue;
 
       }
 
@@ -170,6 +188,7 @@ struct node_info {
       // But that means we also need to move this edge to N1.
   
       if( far_id(*n1_edg_it) > e2_far_node->id) {
+	std::cerr<<"Entered if-4\n";
         merge_n2_less(n_old, e1_local_node, n2_edg_it);
         continue;
       }
@@ -177,6 +196,7 @@ struct node_info {
       //Not same neighbor, N1's edge neighbor is less. Since sorted,
       // increment N1. Reset merge_loss and go to next edge.
       if( far_id(*n1_edg_it) < n_old->far_id(*n2_edg_it) ) {
+	std::cerr<<"Entered if-5 \n";
         (*n1_edg_it)->merge_loss = -1;
         ++n1_edg_it;
         continue;
@@ -185,6 +205,7 @@ struct node_info {
       //If we didn't loop yet, we must have Same neighbor. Confirm.
       assert( far_id(*n1_edg_it) == n_old->far_id(*n2_edg_it) );
 
+      std::cerr<<"Entered past last if\n";
       merge_same_neighbor(n_old, n1_edg_it, n2_edg_it);
 
       //Increment one iterator.
@@ -193,12 +214,14 @@ struct node_info {
 
     // Drain remaining iterator, either n1_edg_it or n2_edg_it
     while(n1_edg_it != n1_edg_end) {
-      //      std::cerr << "Check1 " << **n1_edg_it <<"\n";
+      std::cerr<<"Entered loop 2\n";
+      std::cerr << "Check L-2 " << **n1_edg_it <<"\n";
       (*n1_edg_it)->merge_loss = -1;
       ++n1_edg_it;
     }
     while(n2_edg_it != n2_edg_end) {
-      //      std::cerr << "Check2 " << **n2_edg_it <<"\n";
+      std::cerr<<"Entered loop 3 \n";
+      std::cerr << "Check L-3 " << **n2_edg_it <<"\n";
       merge_n2_less(n_old, e1_local_node, n2_edg_it);
       //      ++n2_edg_it;
     }
