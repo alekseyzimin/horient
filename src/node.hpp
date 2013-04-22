@@ -49,6 +49,17 @@ struct node {
     }
   }
 
+  // Attach to a parent node. Make my orientation relative to
+  // parent. This works only for nodes which are root of their tree
+  // (i.e. parent == 0).
+  void attach_to(node* p) {
+    assert(parent == 0);
+    assert(p->parent == 0);
+    parent = p;
+    orient = (p->orient == orient) ? 1 : -1;
+  }
+
+
   // Traverse the tree upward to the root. Compute the absolute
   // orientation of the current node and all the nodes traversed to
   // the root. The nodes are disconnected from their parent.
@@ -114,8 +125,7 @@ struct node {
 
     //Keep track of relative orientation forest. Orientation in n_old
     //becomes relative to its parent.
-    n_old.parent = this;
-    n_old.orient = (this->orient == n_old.orient) ? 1 : -1;
+    n_old.attach_to(this);
 
     //Cycle through all edges in both nodes, take one of three actions:
     // If edge between them, move interior. -- delete edge
