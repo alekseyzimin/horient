@@ -1,0 +1,28 @@
+#! /bin/sh
+
+TOP=@top_srcdir@
+TEST=${TOP}/test
+
+# Pipe redirection for sh
+p() {
+    d=$(mktemp -d)
+    mkfifo $d/f
+    (exec >/dev/null; (exec "$@") > $d/f; rm $d/f; rmdir $d) &
+    echo $d/f
+}
+
+orient_cmp() {
+    base=$1
+    ./horient ${TEST}/${base}.tally > test/${base}.orient
+    grep -- '\s-1$' test/${base}.orient | cut -d\  -f1 | sort -n > test/${base}.sorted
+    cmp ${TEST}/${base}.ans test/${base}.sorted
+}
+
+# set -e
+
+mkdir -p test
+orient_cmp basic
+orient_cmp basic2
+orient_cmp Bac2ft0sp0.15.5
+orient_cmp Bac2ft0sp0.1.5
+orient_cmp Bac2ft0sp0.05.5

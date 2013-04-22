@@ -20,7 +20,10 @@ EOS
 
 option("o", "output") {
   description "Output file (stdout)"
-  c_string }
+  c_string; typestr "path" }
+option("s", "statistics") {
+  description "Statistics file"
+  c_string; typestr "path" }
 option("f", "foff") {
   description "Turn filter off"
   off }

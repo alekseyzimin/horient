@@ -18,7 +18,8 @@ YAGGO_SOURCES = # Append all file to be built by yaggo
 ##############################
 bin_PROGRAMS = horient
 
-horient_SOURCES = src/horient.cc src/readdata.cpp
+horient_SOURCES = src/horient.cc src/readdata.cpp src/findbest.cpp	\
+                  src/findloss.cpp src/pickflip.cpp
 noinst_HEADERS += src/horient.hpp src/edge_list.hpp src/node.hpp
 YAGGO_SOURCES += src/horient_cmdline.hpp
 
@@ -37,3 +38,11 @@ all_tests_SOURCES += unittests/test_edge.cc unittests/test_node.cc	\
                       src/pickflip.cpp src/findbest.cpp			\
                       unittests/test_merge.cc				\
                       unittests/test_orientation_tree.cc
+
+######################
+# Actual graph tests #
+######################
+TESTS += test_graphs.sh
+test_graphs.sh: test_graphs.sh.in Makefile
+	sed -e 's|[@]top_srcdir[@]|$(top_srcdir)|g' < $< > $@
+	chmod +x $@

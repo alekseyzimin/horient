@@ -22,6 +22,11 @@
 #include <horient.hpp>
 #include <src/horient_cmdline.hpp>
 
+void output_contig_orientation(std::ostream& out, node_map_type& master_node) {
+  for(auto it = master_node.begin(); it != master_node.end(); ++it) {
+    out << it->second.id << " " << it->second.resolve_orientation() << "\n";
+  }
+}
 
 int main(int argc, char *argv[])
 {
@@ -36,6 +41,58 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
   readdata(master_edge, master_node, args.foff_flag, input);
+
+  //While we have edges we haven't joined... loop
+  edge_ptr join_edge;
+  while(master_edge.size()>0) {
+    // Pick the best edge to merge
+    // NOTE: does not track if multiple "fewest options discarded" (FOD) edges are found.
+    //      This means that there is still some ambiguity in join edge choice.
+    //      This could be fixed by more levels of decisions on FOD. (recursive?)
+    join_edge=findbestmerge(master_edge);
+
+    //Perform flipping if necessary
+    if(join_edge->good < join_edge->bad) {
+      //If there are less satisfied than unsatisified mate-pairs on
+      //the edge, flip a node
+      pick_flip(join_edge).flip_node();
+    }
+
+    //Since we've flipped any necessary node. Now we can merge them.
+    join_edge->n1.merge(join_edge->n2);
+  }
+
+  // We always have at least one component.
+   int nb_connected_components = 1;
+
+   if(args.statistics_given) {
+    std::ofstream stats(args.statistics_arg);
+    if(!stats.good()) {
+      std::cerr << "Failed to open statistics file '" << args.statistics_arg << "'"
+                << std::endl;
+      return EXIT_FAILURE;
+    }
+    // Compute number of connected components
+    --nb_connected_components;
+    for(auto it = master_node.cbegin(); it != master_node.cend(); ++it) {
+      nb_connected_components += (it->second.parent == 0);
+    }
+    stats << "Original Contig count: "<< master_node.size() << "\n"
+          << "Connected Components:  "<< nb_connected_components << "\n";
+  }
+
+  if(args.output_given) {
+    std::ofstream file(args.output_arg);
+    if(!file.good()) {
+      std::cerr << "Failed to open output file '" << args.output_arg << "'" << std::endl;
+      return EXIT_FAILURE;
+    }
+    output_contig_orientation(file, master_node);
+  } else {
+    output_contig_orientation(std::cout, master_node);
+  }
+
+  //  int good_bad[nb_connected_components][2];
 
   return 0;
 }
