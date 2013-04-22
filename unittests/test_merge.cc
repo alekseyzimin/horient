@@ -7,19 +7,36 @@
 #include <iostream>
 
 namespace {
+class merge : public ::testing::Test {
+public:
+  merge() : master_edge(node_info::sorted_edge_list_type::master_list)
+  { }
+protected:
+  virtual void SetUp() {
+    master_edge.clear();
+  }
+  virtual void TearDown() {
+    master_edge.clear();
+  }
 
-TEST(merge, fe_graph) {
+  void read_example(const std::string content) {
+    std::istringstream input(content);
+    ASSERT_TRUE(input.good());
+    readdata(master_edge, master_node, true, input);
+  }
+
+  std::list<edge>& master_edge;
+  node_map_type    master_node;
+};
+
+TEST_F(merge, fe_graph) {
     //This should test merging when edge is first on both nodes.
    const std::string content("0 1 4 0 0 0\n"
 			     "1 2 3 0 0 0\n"
-			     "0 3 2 1 0 0\n"
+			     "0 3 2 3 0 0\n"
 			     );
-   std::istringstream input(content);
-   ASSERT_TRUE(input.good());
-   std::list<edge>& master_edge= node_info::sorted_edge_list_type::master_list;
-   node_map_type master_node;
-   readdata(master_edge, master_node, true, input);
-   
+   read_example(content);
+
     edge_ptr tmp_ptr=master_edge.end();
     --tmp_ptr; //point to edge 0 1 4 0 0 0
 
@@ -45,7 +62,7 @@ TEST(merge, fe_graph) {
 	it !=tmp_ptr->n2->edges.local_list.end();++it){
       std::cerr<< **it <<"\n";
     }
-    //Merge "0" into "1"
+    //Merge "1" into "0"
     tmp_ptr->n1->merge(tmp_ptr->n2);
 
     //Post condition expected:
@@ -65,13 +82,14 @@ TEST(merge, fe_graph) {
     EXPECT_EQ( (size_t)0, master_node.find("1")->second->edges.local_list.size());
 
     EXPECT_EQ( 4, master_node.find("0")->second->int_good);
-    EXPECT_EQ( 2, master_edge.begin()->good);
-    EXPECT_EQ( 2, master_edge.begin()->bad);
-    EXPECT_EQ( 3, (++master_edge.begin())->good);
+    EXPECT_EQ( 3, master_edge.begin()->good);
+    EXPECT_EQ( 0, master_edge.begin()->bad);
+    EXPECT_EQ( 2, (++master_edge.begin())->good);
+    EXPECT_EQ( 3, (++master_edge.begin())->bad);
   }
 
 
-  TEST(merge, pf_graph1){
+  TEST_F(merge, pf_graph1){
     //Tests on 4-node demonstration/example error graph 
     // for choosing least loss.
     
@@ -83,12 +101,8 @@ TEST(merge, fe_graph) {
 			      "2 4 5 0 0 0\n"
 			      );
     //After first merge have left:  ( 0->1 0->2 0->3 1->2)
-    std::istringstream input(content);
-    ASSERT_TRUE(input.good());
-    std::list<edge>& master_edge= node_info::sorted_edge_list_type::master_list;
-    node_map_type master_node;
-    readdata(master_edge, master_node, true, input);
-  
+
+    read_example(content);
     edge_ptr tmp_ptr,best_merge;
     
     //At first, just test merging on the last edge.

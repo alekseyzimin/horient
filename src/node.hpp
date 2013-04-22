@@ -121,7 +121,6 @@ struct node_info {
 
     //Local node (self) never changes... the other does!
     node& e1_local_node = (*n1_edg_it)->local_node(this->id);
-    node& e2_far_node = (*n2_edg_it)->far_node(n_old);
 
     //Not for loop because we increment independently.
     // should loop through the two sorted edge lists interior to the two nodes.
@@ -132,18 +131,21 @@ struct node_info {
       //std::cerr << "Check L-1 --E2--" << *n2_edg_it <<"\n";
       std::cerr << "Check L-1 --E1--??" << **n1_edg_it <<"\n";
       std::cerr << "Check L-1 --E2--??" << **n2_edg_it <<"\n";
-      std::cerr << "stupid check --E1--: id1:"<< (*n1_edg_it)->n1->id<<" id2: "<<(*n1_edg_it)->n2->id<<"\n";
+      //std::cerr<<"addr: "<< (void*) &(*n1_edg_it)<<" "<<(void*) &(*n2_edg_it)<<"\n";
+      //std::cerr << "stupid check --E1--: id1:"<< (*n1_edg_it)->n1->id<<" id2: "<<(*n1_edg_it)->n2->id<<"\n";
 
 
       //Need these inside the loops, because we change 
       // the FAR node in e2 (*n2_edg_it) each time!
-      e2_far_node = (*n2_edg_it)->far_node(n_old);
+      node& e2_far_node = (*n2_edg_it)->far_node(n_old);
       std::cerr<<"Far node -e2- ID: "<<e2_far_node->id<<std::endl;
 
       //If edge is identical, it's the merge edge.
       // Move interior. Zero. Go to next loop
 
       //Check if one merging edge for both iterators. If so, change both
+
+      //std::cerr<<"addr: "<< (void*) &(*n1_edg_it)<<" "<<(void*) &(*n2_edg_it)<<"\n";
       if( comp_edge(*n1_edg_it, *n2_edg_it) ){
 	std::cerr<<"Entered if-1 \n";
         int_good+= (*n1_edg_it)->good;
