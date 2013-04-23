@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     }
 
     //Since we've flipped any necessary node. Now we can merge them.
-    join_edge->n1.merge(join_edge->n2);
+    merge_nodes(join_edge->n1, join_edge->n2);
   }
 
   // We always have at least one component.

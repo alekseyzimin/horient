@@ -19,7 +19,7 @@ YAGGO_SOURCES = # Append all file to be built by yaggo
 bin_PROGRAMS = horient
 
 horient_SOURCES = src/horient.cc src/readdata.cpp src/findbest.cpp	\
-                  src/findloss.cpp src/pickflip.cpp
+                  src/findloss.cpp src/pickflip.cpp src/node.cc
 noinst_HEADERS += src/horient.hpp src/edge_list.hpp src/node.hpp
 YAGGO_SOURCES += src/horient_cmdline.hpp
 
@@ -33,11 +33,12 @@ all_tests_LDFLAGS = -lpthread
 all_tests_SOURCES = unittests/gtest/gtest-all.cc unittests/gtest/gtest_main.cc unittests/gtest/gtest.h
 
 all_tests_SOURCES += unittests/test_edge.cc unittests/test_node.cc	\
-                      unittests/test_read_data.cc src/readdata.cpp	\
-                      src/findloss.cpp unittests/test_pickflip.cc	\
-                      src/pickflip.cpp src/findbest.cpp			\
-                      unittests/test_merge.cc				\
-                      unittests/test_orientation_tree.cc
+                     unittests/test_read_data.cc			\
+                     unittests/test_merge.cc				\
+                     unittests/test_pickflip.cc				\
+                     unittests/test_orientation_tree.cc
+all_tests_SOURCES += src/readdata.cpp src/findloss.cpp			\
+                     src/pickflip.cpp src/findbest.cpp src/node.cc
 
 ######################
 # Actual graph tests #

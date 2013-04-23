@@ -31,7 +31,7 @@ std::ostream& operator<<(std::ostream& os, const node& n);
 struct node {
   int id;
   int int_good, int_bad;
-  int size;
+  int size, rank;
   // Hold orientation (1 or -1). If parent == 0, it is absolute,
   // otherwise it is relative to parent.
   int orient;
@@ -41,10 +41,9 @@ struct node {
   typedef sorted_edge_list<edge_type> sorted_edge_list_type;
   sorted_edge_list_type edges;
 
-  node(int id_) : 
-    id(id_), int_good(0), int_bad(0), size(1), 
-    orient(1), parent(0),
-    edges(id_)
+  node(int id_) :
+  id(id_), int_good(0), int_bad(0), size(1), rank(0),
+  orient(1), parent(0), edges(id_)
   { }
 
   void add_edge(const edge_ptr& e) { edges.add_edge(e); }
@@ -55,38 +54,40 @@ struct node {
   }
 
   //flips this node
-  void flip_node(){
+  void flip_node() {
     orient *= -1; //Easy part!
 
     //Now, iterate through all the edges, and swap their good-bad.
-    for(auto edge_it=edges.local_list.begin(); edge_it != edges.local_list.end(); edge_it++){
+    for(auto edge_it=edges.local_list.begin(); edge_it != edges.local_list.end(); ++edge_it){
       std::swap( (*edge_it)->good, (*edge_it)->bad );
       std::swap( (*edge_it)->good2, (*edge_it)->bad2);
     }
   }
 
-  // Attach to a parent node. Make my orientation relative to
-  // parent. This works only for nodes which are root of their tree
-  // (i.e. parent == 0).
-  void attach_to(node* p) {
-    assert(parent == 0);
-    assert(p->parent == 0);
-    parent = p;
-    orient = (p->orient == orient) ? 1 : -1;
+  // Traverse the tree upward to the root. Compute the absolute
+  // orientation of the current node. Path compression is taking
+  // place, similar to the disjoint-set data structure. I.e. all the
+  // nodes on the path to the root are attached to the root and the
+  // orientation is made relative to the root (which is now the direct
+  // parent).
+  int resolve_orientation() {
+    if(!parent) return orient; // Absolute orientation for the root
+    compress_path();
+    return orient * parent->orient;
   }
 
+  // Do the path compression. This is recursive but not tail
+  // recursive. It could potentially blow up the stack (but unlikely
+  // as the tree has logarithmic height). It must NOT be called on a
+  // root node. Should only be called from resolve_orientation.
+  node* compress_path() {
+    if(!parent->parent)
+      return parent;
 
-  // Traverse the tree upward to the root. Compute the absolute
-  // orientation of the current node and all the nodes traversed to
-  // the root. The nodes are disconnected from their parent.
-  //
-  // This is recursive but not tail recursive. It could potentially
-  // blow up the stack.
-  int resolve_orientation() {
-    if(!parent) return orient;
-    orient *= parent->resolve_orientation();
-    parent  = 0;
-    return orient;
+    node* old_parent  = parent;
+    parent            = parent->compress_path();
+    orient           *= old_parent->orient;
+    return parent;
   }
 
   template<typename Iterator>
@@ -135,13 +136,8 @@ struct node {
     //Have to merge edges.
 
     //Update interior int's
-    size     += n_old.size; 
     int_good += n_old.int_good; 
     int_bad  += n_old.int_bad;
-
-    //Keep track of relative orientation forest. Orientation in n_old
-    //becomes relative to its parent.
-    n_old.attach_to(this);
 
     //Cycle through all edges in both nodes, take one of three actions:
     // If edge between them, move interior. -- delete edge
@@ -159,7 +155,8 @@ struct node {
     auto n2_edg_end = n_old.edges.local_list.end();
 
     //Local node (self) never changes
-    node& e1_local_node = (*n1_edg_it)->local_node(*this);
+    //    node& e1_local_node = (*n1_edg_it)->local_node(*this);
+    node& e1_local_node = *this;
 
     //Not for loop because we increment independently.
     // should loop through the two sorted edge lists interior to the two nodes.
@@ -252,5 +249,15 @@ inline std::ostream& operator<<(std::ostream& os, const node& n) {
 }
 
 typedef std::unordered_map<std::string, node> node_map_type;
+
+// Merge nodes by rank.  One of the node becomes the parent of the
+// other. The child's node orientation become relative to the
+// parent. This works only for nodes which are root of their tree
+// (i.e. parent == 0).
+//
+// Then, the edges from the child node are merged into the parent's edges.
+//
+// Returns the child node.
+node* merge_nodes(node& n1, node& n2);
 
 #endif /* _NODE_H_ */
