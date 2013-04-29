@@ -54,7 +54,7 @@ struct node {
   }
 
   //flips this node
-  void flip_node() {
+  node flip_node() {
     orient *= -1; //Easy part!
 
     //Now, iterate through all the edges, and swap their good-bad.
@@ -62,6 +62,7 @@ struct node {
       std::swap( (*edge_it)->good, (*edge_it)->bad );
       std::swap( (*edge_it)->good2, (*edge_it)->bad2);
     }
+    return *this;
   }
 
   // Traverse the tree upward to the root. Compute the absolute

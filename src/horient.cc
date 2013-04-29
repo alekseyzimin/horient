@@ -18,9 +18,10 @@
 #include <cstdlib>
 
 #include <fstream>
-
+#include <string>
 #include <horient.hpp>
 #include <src/horient_cmdline.hpp>
+#include <logclass.hpp>
 
 void output_contig_orientation(std::ostream& out, node_map_type& master_node) {
   for(auto it = master_node.begin(); it != master_node.end(); ++it) {
@@ -34,7 +35,20 @@ int main(int argc, char *argv[])
 
   std::list<edge>& master_edge = node::sorted_edge_list_type::master_list;
   node_map_type master_node;
+  //std::ofstream outfile;
+  logger * master_logger;
+  int step_index=0;
 
+  if(args.logflip_given && args.logjoin_given)
+    { master_logger = new log_out(args.logflip_arg,args.logjoin_arg);   }
+  else if(args.logflip_given)
+    { master_logger = new log_out(args.logflip_arg,"/dev/null");}
+  else if(args.logjoin_given)
+    { master_logger = new log_out("/dev/null",args.logjoin_arg);} 
+  else
+    { master_logger = new log_null;}
+
+	
   std::ifstream input(args.input_arg);
   if(!input.good()) {
     std::cerr << "Can't open input file '" << args.input_arg << "'" << std::endl;
@@ -60,6 +74,8 @@ int main(int argc, char *argv[])
 
     //Since we've flipped any necessary node. Now we can merge them.
     merge_nodes(join_edge->n1, join_edge->n2);
+
+    ++step_index;
   }
 
   // We always have at least one component.

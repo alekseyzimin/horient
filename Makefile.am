@@ -19,8 +19,9 @@ YAGGO_SOURCES = # Append all file to be built by yaggo
 bin_PROGRAMS = horient
 
 horient_SOURCES = src/horient.cc src/readdata.cpp src/findbest.cpp	\
-                  src/findloss.cpp src/pickflip.cpp src/node.cc
-noinst_HEADERS += src/horient.hpp src/edge_list.hpp src/node.hpp
+                  src/findloss.cpp src/pickflip.cpp src/node.cc	
+noinst_HEADERS += src/horient.hpp src/edge_list.hpp src/node.hpp \
+			src/logclass.hpp
 YAGGO_SOURCES += src/horient_cmdline.hpp
 
 ##############################
