@@ -27,10 +27,10 @@ option("s", "statistics") {
 option("f", "foff") {
   description "Turn filter off"
   off }
-option("lf", "logflip"){
+option("p", "logflip") {
 	     description "Log flips to file"
 	     c_string; typestr "path"}
-option("lj", "logjoin"){
+option("j", "logjoin") {
 	     description "Log joins to file"
 	     c_string; typestr "path"}
 # option("w", "weight") {

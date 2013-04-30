@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   std::list<edge>& master_edge = node::sorted_edge_list_type::master_list;
   node_map_type master_node;
   //std::ofstream outfile;
-  logger * master_logger;
+  logging * master_logger;
   int step_index=0;
 
   if(args.logflip_given && args.logjoin_given)
@@ -69,10 +69,11 @@ int main(int argc, char *argv[])
     if(join_edge->good < join_edge->bad) {
       //If there are less satisfied than unsatisified mate-pairs on
       //the edge, flip a node
-      pick_flip(join_edge).flip_node();
+      master_logger->log(pick_flip(join_edge).flip_node(), step_index);
     }
 
     //Since we've flipped any necessary node. Now we can merge them.
+    master_logger->log(join_edge, step_index);
     merge_nodes(join_edge->n1, join_edge->n2);
 
     ++step_index;

@@ -2,59 +2,53 @@
 #include <string>
 #include <horient.hpp>
 
-/*struct nullstream: std::ostream{
-  struct nullbuf: std::streambuf{
-    int overflow(int c) { return traits_type::not_eof(c);}
-    m_sbuf;
-    nullstream():std::ios(&m_sbuf),std::ostream(&m_sbuf){}
-  };
-  };*/
+
 
 class logging {
 public:
-  logging(){};
+  logging(){}
   virtual void log(node flippednode, int indx){  };
 
   virtual  void log(edge_ptr join_edge, int indx){}; 
 
 };
 
+
 class log_out: public logging{
-  std::ostream flipout;//Outstream for flips
-  std::ostream joinout;//Outstream for joins
+  std::ofstream flipout;//Outstream for flips
+  std::ofstream joinout;//Outstream for joins
 
 public:
-  log_out (string, string);
+  log_out(std::string a, std::string b):logging(){
+    flipout.open(a.c_str(), std::ofstream::out | std::ofstream::app);
+    if(!flipout.good()){
+      std::cerr<<"Fail to open flip log file '"<<a<<"'"
+	       << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    
+    joinout.open(b.c_str(), std::ofstream::out | std::ofstream::app);
+    
+    if(!joinout.good()){
+      std::cerr<<"Fail to open join log file '"<<b<<"'"
+	       << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }    
   
   void log(node flippednode, int indx){
-    /*do stuff*/
-
+    flipout<<"Flip node: "<<flippednode<<"\t Step: "<<indx<<std::endl;
   };
 
   void log(edge_ptr join_edge, int indx){
-    /*do stuff!*/
+    joinout<<"Join Edge: "<<*join_edge<<"\t\t\t Step: "<<indx<<std::endl;
   };
 
 };
 
-log_out::log_out ( string a, string b){
-  logging();
-  flipout.open(a.c_string());
-  if(!flipout.good()){
-    std::cerr<<"Fail to open flip log file '"<<a<<"'"
-		 << std::endl;
-	return EXIT_FAILURE;
-  }
+//log_out::log_out(std::string a, std::string b):logging(){
+//};
 
-  joinout.open(b.c_string());
-
-  if(!joinout.good()){
-    std::cerr<<"Fail to open join log file '"<<b<<"'"
-		 << std::endl;
-	return EXIT_FAILURE;
-  }
-
-}
 class log_null: public logging{
 public:
   void log(node flippednode, int indx){ /*do nothing*/  }
