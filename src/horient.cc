@@ -20,15 +20,36 @@
 #include <fstream>
 #include <string>
 #include <memory>
+#include <map>
+#include <vector>
 
 #include <horient.hpp>
 #include <src/horient_cmdline.hpp>
 #include <logclass.hpp>
 
-void output_contig_orientation(std::ostream& out, node_map_type& master_node) {
+struct components_statistics {
+  std::map<node*, std::vector<std::pair<std::string, node*> > > components;
+  int total_good, total_bad;
+
+  components_statistics() : total_good(0), total_bad(0) { }
+};
+
+components_statistics output_stats_contig_orientation(std::ostream& out, node_map_type& master_node) {
+  components_statistics res;
+
   for(auto it = master_node.begin(); it != master_node.end(); ++it) {
-    out << it->first << " " << it->second.resolve_orientation() << "\n";
+    node& n = it->second;
+    out << it->first << " " << n.resolve_orientation() << "\n";
+    if(!n.parent) { // Is root of component
+      res.total_good += n.int_good;
+      res.total_bad  += n.int_bad;
+      res.components[&n].push_back(std::make_pair(it->first, &n));
+    } else {
+      res.components[n.parent].push_back(std::make_pair(it->first, &n));
+    }
   }
+
+  return res;
 }
 
 int main(int argc, char *argv[])
@@ -52,6 +73,7 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
   readdata(master_edge, master_node, args.foff_flag, input);
+  int nb_edges = master_edge.size();
 
   //While we have edges we haven't joined... loop
   edge_ptr join_edge;
@@ -76,37 +98,35 @@ int main(int argc, char *argv[])
     ++step_index;
   }
 
-  // We always have at least one component.
-   int nb_connected_components = 1;
-
-   if(args.statistics_given) {
-    std::ofstream stats(args.statistics_arg);
-    if(!stats.good()) {
-      std::cerr << "Failed to open statistics file '" << args.statistics_arg << "'"
-                << std::endl;
-      return EXIT_FAILURE;
-    }
-    // Compute number of connected components
-    --nb_connected_components;
-    for(auto it = master_node.cbegin(); it != master_node.cend(); ++it) {
-      nb_connected_components += (it->second.parent == 0);
-    }
-    stats << "Original Contig count: "<< master_node.size() << "\n"
-          << "Connected Components:  "<< nb_connected_components << "\n";
-  }
-
+  components_statistics stats;
   if(args.output_given) {
     std::ofstream file(args.output_arg);
     if(!file.good()) {
       std::cerr << "Failed to open output file '" << args.output_arg << "'" << std::endl;
       return EXIT_FAILURE;
     }
-    output_contig_orientation(file, master_node);
+    stats = output_stats_contig_orientation(file, master_node);
   } else {
-    output_contig_orientation(std::cout, master_node);
+    stats = output_stats_contig_orientation(std::cout, master_node);
   }
 
-  //  int good_bad[nb_connected_components][2];
+  if(args.statistics_given) {
+    std::ofstream file(args.statistics_arg);
+    file << "Contig count: " << master_node.size() << "\n"
+         << "Edge count: " << nb_edges << "\n"
+         << "Connected components: " << stats.components.size() << "\n"
+         << "Total good: " << stats.total_good << "\n"
+         << "Total bad: " << stats.total_bad << "\n";
+    if(args.component_flag) {
+      for(auto it = stats.components.cbegin(); it != stats.components.cend(); ++it) {
+        file << "Component good: " << it->first->int_good << " bad: " << it->first->int_bad << " elements:";
+        for(auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2) {
+          file << " " << it2->first << "(" << (it2->second->orient == 1 ? "+" : "-") << ")";
+        }
+        file << "\n";
+      }
+    }
+  }
 
   return 0;
 }

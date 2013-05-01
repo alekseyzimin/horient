@@ -24,6 +24,9 @@ option("o", "output") {
 option("s", "statistics") {
   description "Statistics file"
   c_string; typestr "path" }
+option("c", "component") {
+  description "Output detail on components with statistics"
+  off }
 option("f", "foff") {
   description "Turn filter off"
   off }
