@@ -19,6 +19,8 @@
 
 #include <fstream>
 #include <string>
+#include <memory>
+
 #include <horient.hpp>
 #include <src/horient_cmdline.hpp>
 #include <logclass.hpp>
@@ -36,19 +38,18 @@ int main(int argc, char *argv[])
   std::list<edge>& master_edge = node::sorted_edge_list_type::master_list;
   node_map_type master_node;
   //std::ofstream outfile;
-  logging * master_logger;
+  std::unique_ptr<logging> master_logger;
   int step_index=0;
 
   if(args.logflip_given && args.logjoin_given)
-    { master_logger = new log_out(args.logflip_arg,args.logjoin_arg);   }
+    { master_logger.reset(new log_out(args.logflip_arg,args.logjoin_arg));   }
   else if(args.logflip_given)
-    { master_logger = new log_out(args.logflip_arg,"/dev/null");}
+    { master_logger.reset(new log_out(args.logflip_arg,"/dev/null"));}
   else if(args.logjoin_given)
-    { master_logger = new log_out("/dev/null",args.logjoin_arg);} 
+    { master_logger.reset(new log_out("/dev/null",args.logjoin_arg));}
   else
-    { master_logger = new log_null;}
+    { master_logger.reset(new log_null);}
 
-	
   std::ifstream input(args.input_arg);
   if(!input.good()) {
     std::cerr << "Can't open input file '" << args.input_arg << "'" << std::endl;
