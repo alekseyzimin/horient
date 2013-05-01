@@ -41,12 +41,8 @@ int main(int argc, char *argv[])
   std::unique_ptr<logging> master_logger;
   int step_index=0;
 
-  if(args.logflip_given && args.logjoin_given)
-    { master_logger.reset(new log_out(args.logflip_arg,args.logjoin_arg));   }
-  else if(args.logflip_given)
-    { master_logger.reset(new log_out(args.logflip_arg,"/dev/null"));}
-  else if(args.logjoin_given)
-    { master_logger.reset(new log_out("/dev/null",args.logjoin_arg));}
+  if(args.log_given)
+    { master_logger.reset(new log_out(args.log_arg)); }
   else
     { master_logger.reset(new log_null);}
 

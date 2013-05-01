@@ -27,12 +27,9 @@ option("s", "statistics") {
 option("f", "foff") {
   description "Turn filter off"
   off }
-option("p", "logflip") {
-	     description "Log flips to file"
-	     c_string; typestr "path"}
-option("j", "logjoin") {
-	     description "Log joins to file"
-	     c_string; typestr "path"}
+option("l", "log") {
+  description "Log flips and merges to file"
+  c_string; typestr "path"}
 # option("w", "weight") {
 #   description "Weighting for column 5 and 6"
 #   double }
