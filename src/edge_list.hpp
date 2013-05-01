@@ -118,6 +118,11 @@ struct sorted_edge_list {
   sorted_edge_list(int id) : local_list(edge_comparator(id)) { }
 
   void add_edge(const edge_ptr& e) { local_list.insert(e); }
+  std::pair<bool, edge_ptr> find_edge(const edge_ptr& e) {
+    auto it = local_list.find(e);
+    bool found = (it != local_list.end());
+    return std::make_pair(found, found ? *it : e);
+  }
   void merge(sorted_edge_list& rhs) { }
 };
 template<typename E>

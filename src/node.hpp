@@ -47,6 +47,9 @@ struct node {
   { }
 
   void add_edge(const edge_ptr& e) { edges.add_edge(e); }
+  std::pair<bool, edge_ptr> find_edge(const edge_ptr& e) {
+    return edges.find_edge(e);
+  }
 
   //function to return neighbor on edge
   int far_id(const edge_ptr& e) const {
@@ -162,6 +165,11 @@ struct node {
     //Not for loop because we increment independently.
     // should loop through the two sorted edge lists interior to the two nodes.
     while( n1_edg_it != n1_edg_end && n2_edg_it != n2_edg_end ) {
+      // if((*n1_edg_it)->n1.id == 156 || (*n1_edg_it)->n2.id == 156 ||
+      //    (*n2_edg_it)->n1.id == 156 || (*n2_edg_it)->n2.id == 156) {
+      //   asm("int3;");
+      // }
+
       //Need these inside the loops, because we change 
       // the FAR node in e2 (*n2_edg_it) each time!
       node& e2_far_node = (*n2_edg_it)->far_node(n_old);

@@ -66,8 +66,17 @@ std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::ist
     //Make a new edge
     master_edge.push_front(edge(tmp_n0, tmp_n1, wght1, wght2));
 
-    //Use the returned iterator to add in nodes
-    tmp_n0.add_edge(master_edge.begin());
-    tmp_n1.add_edge(master_edge.begin());
+    //Check if edge is duplicated
+    auto it = tmp_n0.find_edge(master_edge.begin());
+    if(!it.first) { // New -> add to adjacent nodes
+      tmp_n0.add_edge(master_edge.begin());
+      tmp_n1.add_edge(master_edge.begin());
+    } else {  // found -> update existing
+      it.second->good  += wght1;
+      it.second->bad   += wght2;
+      // it.second->good2 += wgth3;
+      // it.second->bad2  += wght4;
+      master_edge.pop_front();
+    }
   }
 }

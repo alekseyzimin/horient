@@ -21,7 +21,7 @@ class log_out: public logging{
 
 public:
   log_out(std::string a) :
-    logout(a.c_str(), std::ofstream::out | std::ofstream::app)
+    logout(a.c_str())
   {
     if(!logout.good()){
       std::cerr<<"Fail to open flip log file '"<<a<<"'"
@@ -31,11 +31,11 @@ public:
   }
 
   void log(const node& flippednode, int indx){
-    logout<<"Node flip: "<<flippednode<<"\tStep: "<<indx<<std::endl;
+    logout<<"Node flip:\t"<<flippednode<<"\tStep:\t"<<indx<<std::endl;
   };
 
   void log(const edge_ptr& join_edge, int indx){
-    logout<<"Edge join: "<<*join_edge<<"\t\t\tStep: "<<indx<<std::endl;
+    logout<<"Edge join:\t"<<*join_edge<<"\tStep:\t"<<indx<<std::endl;
   };
 
 };
