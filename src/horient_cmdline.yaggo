@@ -15,7 +15,59 @@
 
 purpose "Orient contigs with respect to each other."
 description <<EOS
-Longer blahblah
+This program implements a hierarchical based orientation method. A long development, and analysis of the method can be found in the doctoral dissertation of Karl Schmitt:
+Network Algorithms for Complex Systems with Applications to Nonlinear Optics and Genome Assembly, Karl Schmitt, May 2013
+
+---------------
+
+Extended Description of Command-line options:
+
+<path>	 	      	     Required to provide a path to the input tally file. Format is given below.
+
+-o/-output <path>  	     This allows the specification of an output file for the contig/orientation to be written to. Default is stdout
+	    	     	     Output is formatted:  <contig> <+/- 1>
+	    	     	     A '-1' indicates a flip from original orientation.
+
+-s/-statistics <path>	     This turns on a brief output of statistics from the tally file: Contig count, edge count, component count, total satisfied/unsatisfied mate-pairs.
+
+-c/-component  		     This is a flag for a more verbose output in statistics. Each disjoint component is printed on a separate line with it's size, good/bad count, and members.
+			     Default is OFF
+
+-f/-foff		     This is a flag to indicate if basic data cleaning should be performed.
+			     Basic cleaning consists of discarding any edge with a 1/0 or 0/1 weighting, an equal good/bad weighting (i.e. 5/5 or 2/2), and any '1' in a weighting of #/1 or 1/#
+			     Including this option will turn basic cleaning OFF.
+			     Default is basic cleaning is ON. 
+
+-l/-log <path>		     This option turns on logging of actions in the algorithm. Output to the given file are nodes which are flipped (by node) and edges which are merged over. Included is the step in the algorithm which this occurred at.
+
+---------------
+
+Several things to note:
+1) Currently, a weighting scheme based on the difference between satisfied and unsatisfied mate-pairs, and total mate-pairs is implemented. This has been found to be the most effective, simple weighting possible. More complex schemes, or schemes using more data might improve results, and can be implemented and compiled.
+
+2) The weighting scheme (entire algorithm) currently only uses columns 1-4 of a tally file. It can be relatively trivially modified to allow columns 5/6 with less trusted mate-pairs to be included. No functionallity (besides input) is guaranteed when using these columns.
+
+3) Orientations are output RELATIVE TO INPUT orientations. The algorithm assumes an 'all-forward' initial orientation. So if data is from previously oriented contigs, these orientations are relative to those.
+---------------
+
+Expected Input:
+Tally file must contain 6 columns in the format:
+<Contig 1>  <Contig 2>  <Weight 1>  <Weight 2> <Weight 3> <Weight 4>
+Contig names can be any string WITHOUT spaces.
+Weights 1 & 2 are assumed to be Good/Bad respectively.
+Weights 3 & 4 are currently discarded.
+
+----------------
+
+Edge Weight Equation:
+e_ij = Edge weight between contig i and contig j
+s_ij = Satisfied mate-pairs between contig i and contig j (assumed to be weight 1)
+u_ij = Unsatisfied mate-pairs between contigs i and contig j (assumed to be weight 2)
+
+e_ij = |s_ij - u_ij| * ( |s_ij - u_ij|/|s_ij+u_ij| )
+
+----------------
+
 EOS
 
 option("o", "output") {

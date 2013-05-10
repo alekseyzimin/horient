@@ -24,6 +24,9 @@
 
 #include <edge_list.hpp>
 #include <iostream>
+#include <string>
+#include <sstream>
+//#include <ostringstream>
 
 struct node;
 std::ostream& operator<<(std::ostream& os, const node& n);
@@ -36,15 +39,26 @@ struct node {
   // otherwise it is relative to parent.
   int orient;
   node* parent;
+  std::string name;
   typedef edge_base<node> edge_type;
   typedef sorted_edge_list<edge_type>::edge_ptr edge_ptr;
   typedef sorted_edge_list<edge_type> sorted_edge_list_type;
   sorted_edge_list_type edges;
 
-  node(int id_) :
+
+  node(int id_, std::string name_) :
   id(id_), int_good(0), int_bad(0), size(1), rank(0),
-  orient(1), parent(0), edges(id_)
+  orient(1), parent(0), name(name_), edges(id_)
   { }
+
+ node(int id_) :
+  id(id_), int_good(0), int_bad(0), size(1), rank(0),
+  orient(1), parent(0), name("null"), edges(id_)
+  {
+    std::ostringstream convert;
+    convert<<id_;
+    name= convert.str();
+}
 
   void add_edge(const edge_ptr& e) { edges.add_edge(e); }
   std::pair<bool, edge_ptr> find_edge(const edge_ptr& e) {
@@ -57,7 +71,7 @@ struct node {
   }
 
   //flips this node
-  node flip_node() {
+  node& flip_node() {
     orient *= -1; //Easy part!
 
     //Now, iterate through all the edges, and swap their good-bad.
@@ -253,7 +267,7 @@ struct node {
 };
 
 inline std::ostream& operator<<(std::ostream& os, const node& n) {
-  return os << "<id:" << n.id << " good:" << n.int_good << " bad:" << n.int_bad
+  return os << "<id:" << n.name << " good:" << n.int_good << " bad:" << n.int_bad
             << " size:" << n.size << " edges_size:" << n.edges.local_list.size() << ">";
 }
 

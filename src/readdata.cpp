@@ -22,11 +22,11 @@
 
 #include <horient.hpp>
 
-node& insert_node(std::string label, node_map_type& master_node, int& id) {
+node& insert_node(std::string label, node_map_type& master_node, int& id, std::string nam) {
   auto it = master_node.find(label);
   if(it != master_node.end())
     return it->second;
-  return master_node.insert(std::make_pair(label, node(id++))).first->second;
+  return master_node.insert(std::make_pair(label, node(id++, nam))).first->second;
 }
 
 //Assumes fntally has been defined globally.
@@ -56,8 +56,8 @@ std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::ist
       continue;
 
     //Find (or create) pointers to the input nodes.
-    node& tmp_n0 = insert_node(node1, master_node, id);
-    node& tmp_n1 = insert_node(node2, master_node, id);
+    node& tmp_n0 = insert_node(node1, master_node, id, node1);
+    node& tmp_n1 = insert_node(node2, master_node, id, node2);
 
     //Zero out single 'bad' mate-pairs (if there is data in other entry)
     if(filters && wght1==1 && wght2>1) { wght1=0; }

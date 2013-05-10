@@ -88,12 +88,12 @@ int main(int argc, char *argv[])
     if(join_edge->good < join_edge->bad) {
       //If there are less satisfied than unsatisified mate-pairs on
       //the edge, flip a node
-      master_logger->log(pick_flip(join_edge).flip_node(), step_index);
+      master_logger->log(pick_flip(join_edge).flip_node());
     }
 
     //Since we've flipped any necessary node. Now we can merge them.
-    master_logger->log(join_edge, step_index);
-    merge_nodes(join_edge->n1, join_edge->n2);
+    master_logger->log(join_edge, merge_nodes(join_edge->n1, join_edge->n2), step_index);
+
 
     ++step_index;
   }

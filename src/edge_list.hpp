@@ -79,7 +79,7 @@ struct edge_base {
 
 template<typename N>
 std::ostream& operator<<(std::ostream& o, const edge_base<N>& e) {
-  return o << "<id1:" << e.n1.id << " id2:" << e.n2.id
+  return o << "<id1:" << e.n1.name << " id2:" << e.n2.name
            << " good:" << e.good << " bad:" << e.bad << ">";
 }
 

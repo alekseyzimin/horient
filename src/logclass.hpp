@@ -9,15 +9,17 @@
 
 class logging {
 public:
-  virtual void log(const node& flippednode, int indx) = 0;
+  virtual void log(node& flippednode) = 0;
 
-  virtual  void log(const edge_ptr& join_edge, int indx) = 0;
+  virtual  void log(const edge_ptr& join_edge, const node* parnt, int indx) = 0;
 
 };
 
 
 class log_out: public logging{
   std::ofstream logout; //Outstream for flips
+  //  std::string tmpbuff;
+  node* tmpflp=NULL; //Hold a pointer to flipped node for checking output.
 
 public:
   log_out(std::string a) :
@@ -30,12 +32,25 @@ public:
     }
   }
 
-  void log(const node& flippednode, int indx){
-    logout<<"Node flip:\t"<<flippednode<<"\tStep:\t"<<indx<<std::endl;
+  void log(node& flippednode){
+    tmpflp=&flippednode; //Just store which node got flipped.
   };
 
-  void log(const edge_ptr& join_edge, int indx){
-    logout<<"Edge join:\t"<<*join_edge<<"\tStep:\t"<<indx<<std::endl;
+  void log(const edge_ptr& join_edge, const node* child, int indx){
+
+    //Log the two nodes we joined.
+    logout<<child->parent->name<<"\t"<<child->name;
+
+    //Log the flips if any.
+    if(tmpflp==child){ logout<<"\t+-\t";}    //If we previously recorded a flip on the child...
+    else if(tmpflp==child->parent){logout<<"\t-+\t";  } //If we recorded flip on parent...
+    else{ logout<<"\t++\t";}  //If we didn't record flip
+    
+    //Log some information about the join.
+    logout<<"good\t"<<join_edge->good<<"\tbad\t"<<join_edge->bad	\
+	  <<"\tStep\t"<<indx<<"\n";
+
+    tmpflp=NULL; //Reset node pointer. Otherwise error on flip logic above.
   };
 
 };
@@ -45,8 +60,8 @@ public:
 
 class log_null: public logging {
 public:
-  void log(const node& flippednode, int indx){ /*do nothing*/  }
-  void log(const edge_ptr& join_edge, int indx){ /*do nothing*/}
+  void log(node& flippednode){ /*do nothing*/  }
+  void log(const edge_ptr& join_edge, const node* parnt, int indx){ /*do nothing*/}
 
 };
 
