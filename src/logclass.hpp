@@ -6,6 +6,21 @@
 #include <horient.hpp>
 
 
+/*
+This function implements logging.
+Log output takes the format:
+<parent:name> <child:name> <orientation change> good <edge-good> bad <edge-bad> Step <step index>
+
+orientation change is formatted:
++ = no change
+- = change
+So:
+++ = no changes
++- = child changed
+-+ = parent changed
+
+*/
+
 
 class logging {
 public:

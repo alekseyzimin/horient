@@ -38,7 +38,7 @@ Extended Description of Command-line options:
 			     Including this option will turn basic cleaning OFF.
 			     Default is basic cleaning is ON. 
 
--l/-log <path>		     This option turns on logging of actions in the algorithm. Output to the given file are nodes which are flipped (by node) and edges which are merged over. Included is the step in the algorithm which this occurred at.
+-l/-log <path>		     This option turns on logging of actions in the algorithm. Format of output is given below.
 
 ---------------
 
@@ -67,6 +67,18 @@ u_ij = Unsatisfied mate-pairs between contigs i and contig j (assumed to be weig
 e_ij = |s_ij - u_ij| * ( |s_ij - u_ij|/|s_ij+u_ij| )
 
 ----------------
+
+Log output takes the format:
+<parent:name> <child:name> <orientation change> good <edge-good> bad <edge-bad> Step <step index>
+
+orientation change is formatted:
++ = no change
+- = change
+So:
+++ = no changes
++- = child changed
+-+ = parent changed
+
 
 EOS
 
