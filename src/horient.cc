@@ -72,6 +72,8 @@ int main(int argc, char *argv[])
     std::cerr << "Can't open input file '" << args.input_arg << "'" << std::endl;
     exit(EXIT_FAILURE);
   }
+
+  //Passing the negative of "foff" so that if flag is set, we turn filters off...
   readdata(master_edge, master_node, args.foff_flag, input);
   int nb_edges = master_edge.size();
 
@@ -92,11 +94,14 @@ int main(int argc, char *argv[])
     }
 
     //Since we've flipped any necessary node. Now we can merge them.
-    master_logger->log(join_edge, merge_nodes(join_edge->n1, join_edge->n2), step_index);
+    master_logger->log(join_edge);
+    master_logger->log(merge_nodes(join_edge->n1, join_edge->n2), step_index);
 
 
     ++step_index;
   }
+
+  master_logger.reset(); //Deletes the log object. Forcing flush of any remaining ostream
 
   components_statistics stats;
   if(args.output_given) {
@@ -109,6 +114,7 @@ int main(int argc, char *argv[])
   } else {
     stats = output_stats_contig_orientation(std::cout, master_node);
   }
+  std::cout<<step_index;
 
   if(args.statistics_given) {
     std::ofstream file(args.statistics_arg);
