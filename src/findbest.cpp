@@ -33,7 +33,7 @@ edge_ptr findbestmerge(std::list<edge>& master_edge){
   // Want a list of iterators, into an edge list to indicate where in
   // master_edge list max's are
   std::list<edge_ptr> max_links;
-  double max_score = std::numeric_limits<double>::min();
+  double max_score = std::numeric_limits<double>::lowest();
 
   // Iterate through the entire master edge list, storing any edges
   // with a maximum score.
