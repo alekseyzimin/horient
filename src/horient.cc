@@ -101,8 +101,6 @@ int main(int argc, char *argv[])
     ++step_index;
   }
 
-  master_logger.reset(); //Deletes the log object. Forcing flush of any remaining ostream
-
   components_statistics stats;
   if(args.output_given) {
     std::ofstream file(args.output_arg);
@@ -114,7 +112,7 @@ int main(int argc, char *argv[])
   } else {
     stats = output_stats_contig_orientation(std::cout, master_node);
   }
-  std::cout<<step_index;
+  //std::cout<<step_index<<"\n";
 
   if(args.statistics_given) {
     std::ofstream file(args.statistics_arg);

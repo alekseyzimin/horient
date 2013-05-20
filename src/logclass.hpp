@@ -30,6 +30,7 @@ public:
 
   virtual void log(const node* child, int indx)=0;
 
+  virtual ~logging() { }
 };
 
 
