@@ -57,11 +57,6 @@ struct edge_base {
     n1(x), n2(y),
     good(g), bad(b), good2(g2), bad2(b2), merge_loss(-1)
   { }
-  edge_base(int x, int y, int g, int b, int g2, int b2) :
-    n1(x),
-    n2(y),
-    good(g), bad(b), good2(g2), bad2(b2), merge_loss(-1)
-  { }
 
   bool operator<(const edge_base& e) const {
     return n1 < e.n1 || (!(e.n1 < n1) && n2 < e.n2);
@@ -85,7 +80,7 @@ struct edge_base {
   // }
 
   //  double score() const { S f; return f(good, bad, good2, bad2); }
-  double score() const { return score_function(good, bad, good2, bad2); }
+  double score() const { return (score_function(good, bad, good2, bad2) / (n1.size *n2.size) ); } //Enforces average scoring.
 };
 
 template<typename N>

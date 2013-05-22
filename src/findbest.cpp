@@ -35,30 +35,23 @@ edge_ptr findbestmerge(master_list_type& master_edge){
   std::list<edge_ptr> max_links;
   double max_score = std::numeric_limits<double>::lowest();
 
+  assert(master_edge.size()!=0);//make sure we don't have an empty list.
+
   // Iterate through the entire master edge list, storing any edges
   // with a maximum score.
   for(edge_ptr m_edg_it = master_edge.begin(); m_edg_it != master_edge.end(); ++m_edg_it) {
     // The averaged score on a given node is the score, divided by the
     // maximum possible edges in it.
-    double avg_score=
-      m_edg_it->score() /
-      ( m_edg_it->n1.size * m_edg_it->n2.size );
+    double avg_score= m_edg_it->score();
 
     // We didn't find a new maximum, loop in for.
-    if(avg_score < max_score){ continue;}
+    if(avg_score < max_score){ break;}
+    max_score=avg_score;
 
     // If it's equal to our max score, push it onto the list of
     // max-edges then go to next edge
-    if(avg_score == max_score) {
-      max_links.push_front(m_edg_it);
-      continue;
-    }
+    max_links.push_front(m_edg_it);
 
-    // If we didn't continue above, we found a new max!
-    // Clear contents of list, reset maxscore, and add new edge.
-    max_links.clear(); //clear contents
-    max_links.push_front(m_edg_it); //push our new first max
-    max_score = avg_score; //make avg score our new max score.
   }
 
   // We now have a list of max edges. If there is only 1, return it.

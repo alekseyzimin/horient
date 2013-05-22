@@ -9,11 +9,12 @@ namespace {
   TEST(Edge, Simple) {
     //  edge::score_function = diff_square; // This is the default
     
-    typedef edge_base<int> edge_i;
+    //    typedef edge_base<int> edge_i;
 
-    int n0 = 0, n1 = 1;//, n2 = 2, n3 = 3;
-    edge_i e0(n0, n1, 2, 0);
-    edge_i e1(n1, n0, 1, 2);
+    node n0(0);
+    node n1(1);
+    edge e0(n0, n1, 2, 0);
+    edge e1(n1, n0, 1, 2);
     
     EXPECT_EQ(2.0, e0.score());
     EXPECT_FLOAT_EQ(1.0 / 3.0, e1.score());
