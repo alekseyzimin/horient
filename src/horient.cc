@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 {
   horient_cmdline args(argc, argv);
 
-  std::list<edge>& master_edge = node::sorted_edge_list_type::master_list;
+  master_list_type& master_edge = node::sorted_edge_list_type::master_list;
   node_map_type master_node;
   //std::ofstream outfile;
   std::unique_ptr<logging> master_logger;

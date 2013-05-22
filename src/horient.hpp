@@ -24,7 +24,8 @@
 #include <node.hpp>
 
 typedef edge_base<node> edge;
-typedef std::list<edge>::iterator edge_ptr;
+typedef std::set<edge, edge_score_comparator<edge> > master_list_type;
+typedef master_list_type::iterator edge_ptr;
 
 //Function to read data into master edge and master node list.
 // filters -- indicates if simple data cleaning should occur
@@ -32,7 +33,7 @@ typedef std::list<edge>::iterator edge_ptr;
 //                input accesses a validly formated tally-file (6-columns)
 // POSTCONDITION: master_edge !empty
 // POSTCONDITION: master_node !empty
-void readdata(std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::istream& input);
+void readdata(master_list_type& master_edge, node_map_type& master_node, bool filters, std::istream& input);
 
 //Function to pick a node to flip
 //PRECONDITION: we have decided to flip a node connected to the passed edge
@@ -54,7 +55,7 @@ node& pick_flip(const edge_ptr& join_edge);
 //PRECONDITION: master_edge !empty
 //POSTCONDITION: edge_ptr returned. 
 //??POSTMAYBE: some edges have a merge-loss calculated.
-edge_ptr findbestmerge(std::list<edge>& master_edge);
+edge_ptr findbestmerge(master_list_type& master_edge);
 
 //Function to find the loss for merging over a given edge
 //PRECONDITION: edge e exists, nodes connected exist, e->merge_loss == NULL 

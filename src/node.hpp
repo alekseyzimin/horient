@@ -119,10 +119,12 @@ struct node {
     edge_type e(local, far,
                 (*n2_edg_it)->good, (*n2_edg_it)->bad,
                 (*n2_edg_it)->good2, (*n2_edg_it)->bad2);
-    edges.master_list.push_front(e);
-    edge_ptr ne = edges.master_list.begin();
-    add_edge(ne);
-    far.add_edge(ne);
+    // edges.master_list.push_front(e);
+    // edge_ptr ne = edges.master_list.begin();
+    auto res = edges.master_list.insert(e);
+    assert(res.second); // Edge was inserted
+    add_edge(res.first);
+    far.add_edge(res.first);
 
     far.edges.local_list.erase(*n2_edg_it);
     edges.master_list.erase(*n2_edg_it);
@@ -240,7 +242,7 @@ struct node {
       //Not same neighbor, N1's edge neighbor is less. Since sorted,
       // increment N1. Reset merge_loss and go to next edge.
       if( far_id(*n1_edg_it) < n_old.far_id(*n2_edg_it) ) {
-        (*n1_edg_it)->merge_loss = -1;
+        (*n1_edg_it)->reset_merge_loss();
         ++n1_edg_it;
         continue;
       }
@@ -256,7 +258,7 @@ struct node {
 
     // Drain remaining iterator, either n1_edg_it or n2_edg_it
     while(n1_edg_it != n1_edg_end) {
-      (*n1_edg_it)->merge_loss = -1;
+      (*n1_edg_it)->reset_merge_loss();
       ++n1_edg_it;
     }
     while(n2_edg_it != n2_edg_end) {

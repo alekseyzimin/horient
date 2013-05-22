@@ -32,8 +32,7 @@ node& insert_node(std::string label, node_map_type& master_node, int& id, std::s
 //Assumes fntally has been defined globally.
 //Assumes the tally-file is in a 6-column format
 //Requires access to the master edge & node lists.
-void readdata(
-std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::istream& input) {
+void readdata(master_list_type& master_edge, node_map_type& master_node, bool filters, std::istream& input) {
   std::string node1, node2;
   int         wght1,wght2,wght3,wght4;
   int         id = 0;
@@ -64,19 +63,20 @@ std::list<edge>& master_edge, node_map_type& master_node, bool filters, std::ist
     if(filters && wght2==1 && wght1>1) { wght2=0; }
 
     //Make a new edge
-    master_edge.push_front(edge(tmp_n0, tmp_n1, wght1, wght2));
+    auto res= master_edge.insert(edge(tmp_n0, tmp_n1, wght1, wght2));
+    auto it = tmp_n0.find_edge(res.first);
 
-    //Check if edge is duplicated
-    auto it = tmp_n0.find_edge(master_edge.begin());
+    //Edges should be merged if: (n1==m1 && n2==m2 ) || (n2==m1 && n1==m2)
     if(!it.first) { // New -> add to adjacent nodes
-      tmp_n0.add_edge(master_edge.begin());
-      tmp_n1.add_edge(master_edge.begin());
+      tmp_n0.add_edge(res.first);
+      tmp_n1.add_edge(res.first);
     } else {  // found -> update existing
       it.second->good  += wght1;
       it.second->bad   += wght2;
       // it.second->good2 += wgth3;
       // it.second->bad2  += wght4;
-      master_edge.pop_front();
+      if(res.second)
+        master_edge.erase(res.first);
     }
   }
 }

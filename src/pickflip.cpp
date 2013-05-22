@@ -20,19 +20,6 @@
 #include <iostream>
 
 
-//Might not need these? Might be defined/referenced elsewhere?
-//typedef std::list<edge>::iterator edge_ptr;
-// struct edge_comparator {
-//   int id;
-//   edge_comparator(int id_) : id(id_) {}
-//   inline int far_id(const edge_ptr& e){
-//     return (*e->n1)->id = id ? (*e->n2)->id : (*e->n1)->id;
-//   }
-//   bool operator()(const edge_ptr& x, const edge_ptr& y){
-//     return far_id(x) < far_id(y);
-//   }
-// };
-
 template<typename T, typename U>
 std::pair<T&, U&> tie(T& x, U& y) { return std::pair<T&, U&>(x, y); }
 

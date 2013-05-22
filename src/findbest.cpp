@@ -29,7 +29,7 @@
 
 //We're going to be a little less efficient on this and iterate through all the edges,
 // rather thans storing a maximum link per node, and iterating through the nodes. ( O(n) vs. O(e) )
-edge_ptr findbestmerge(std::list<edge>& master_edge){
+edge_ptr findbestmerge(master_list_type& master_edge){
   // Want a list of iterators, into an edge list to indicate where in
   // master_edge list max's are
   std::list<edge_ptr> max_links;

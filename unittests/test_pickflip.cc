@@ -1,5 +1,4 @@
 #include <string>
-// #include <sstream>
 #include <fstream>
 #include <iostream>
 
@@ -20,13 +19,13 @@ TEST(pickflip, Small) {
 
   std::istringstream input(content);
   ASSERT_TRUE(input.good());
-  std::list<edge> master_edge;
+  master_list_type master_edge;
   node_map_type master_node;
   readdata(master_edge, master_node, true, input);
 
   // should return pointer to first node in master list (these are
   // reverse order of above)
-  auto it = master_edge.begin();
+  auto it = find_edge(master_edge, "2", "3");
 
   { // Test 1st edge
     // Picks node to flip on edge  
@@ -42,7 +41,7 @@ TEST(pickflip, Small) {
   }
 
   { // Test 2nd edge
-    ++it;
+    it = find_edge(master_edge, "2", "5");
     auto it2= master_node.find("5");
 
     // Checks to make sure we found the right node to check out pick
@@ -55,7 +54,7 @@ TEST(pickflip, Small) {
   }
 
   { // Test 3rd edge
-    ++it; //test the 3rd edge
+    it = find_edge(master_edge, "1", "4");
     auto it2=master_node.find("4");
 
     // Checks to make sure we found the right node to check out pick
@@ -70,7 +69,7 @@ TEST(pickflip, Small) {
 
   { // Test 6th edge
     //This should default to picking the first node in the edge.
-    it++;it++;it++;//6th Edge: 5 3 0 11 0 0
+    it = find_edge(master_edge, "3", "5");
     auto it2=master_node.find("5" );
 
     //Checks to make sure we found the right node 
