@@ -44,16 +44,16 @@ struct node {
   typedef sorted_edge_list<edge_type>::edge_ptr edge_ptr;
   typedef sorted_edge_list<edge_type> sorted_edge_list_type;
   sorted_edge_list_type edges;
-
+  bool flippable;
 
   node(int id_, std::string name_) :
   id(id_), int_good(0), int_bad(0), size(1), rank(0),
-  orient(1), parent(0), name(name_), edges(id_)
+  orient(1), parent(0), name(name_), edges(id_), flippable(true)
   { }
 
  node(int id_) :
   id(id_), int_good(0), int_bad(0), size(1), rank(0),
-  orient(1), parent(0), name("null"), edges(id_)
+  orient(1), parent(0), name("null"), edges(id_), flippable(true)
   {
     std::ostringstream convert;
     convert<<id_;

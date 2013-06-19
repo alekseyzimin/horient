@@ -35,6 +35,11 @@ typedef master_list_type::iterator edge_ptr;
 // POSTCONDITION: master_node !empty
 void readdata(master_list_type& master_edge, node_map_type& master_node, bool filters, std::istream& input);
 
+//Function to read input file and lock the orienations of nodes
+//PRECONDITION: 'input' has been successfully opened, file is list of node-labels
+//POSTCONDITION: all nodes in input file in master_node has "flippable" set to false
+void locknodes(node_map_type& master_node, std::istream& input);
+
 //Function to pick a node to flip
 //PRECONDITION: we have decided to flip a node connected to the passed edge
 //POSTCONDITION: we return a pointer to a node we should flip (that is connected to the edge)
@@ -46,7 +51,6 @@ node& pick_flip(const edge_ptr& join_edge);
 //POSTCONDITION: All edges connected to node have swapped good/bad values. 
 
 // Implemented inside "node information" struct now.
-
 //void flip_node(node* n0);
 
 

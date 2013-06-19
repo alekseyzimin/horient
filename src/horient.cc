@@ -73,9 +73,20 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  //Passing the negative of "foff" so that if flag is set, we turn filters off...
+  //If flag is set, we turn filters off...
   readdata(master_edge, master_node, args.foff_flag, input);
   int nb_edges = master_edge.size();
+  
+  //Check for locking the orientation of nodes.
+  if(args.noflip_given)
+    {
+      std::ifstream nofliplist(args.noflip_arg);
+      if(!nofliplist.good()){
+	std::cerr << "Can't open file of nodes to lock: '"<<args.noflip_arg<<"'"<<std::endl;
+	exit(EXIT_FAILURE);
+      }
+      locknodes(master_node,nofliplist);
+    }
 
   //While we have edges we haven't joined... loop
   edge_ptr join_edge;
@@ -86,14 +97,14 @@ int main(int argc, char *argv[])
     //      This could be fixed by more levels of decisions on FOD. (recursive?)
     join_edge=findbestmerge(master_edge);
 
-    //Perform flipping if necessary
-    if(join_edge->good < join_edge->bad) {
+    //Perform flipping if necessary (note have to check at least one is flippable)
+    if(join_edge->good < join_edge->bad && (join_edge->n1.flippable || join_edge->n2.flippable) ) {
       //If there are less satisfied than unsatisified mate-pairs on
-      //the edge, flip a node
+      //the edge and at least one is not locked, flip a node
       master_logger->log(pick_flip(join_edge).flip_node());
     }
 
-    //Since we've flipped any necessary node. Now we can merge them.
+    //Since we've flipped any necessary (or possible) node. Now we can merge them.
     master_logger->log(join_edge);
     master_logger->log(merge_nodes(join_edge->n1, join_edge->n2), step_index);
 

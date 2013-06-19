@@ -40,6 +40,7 @@ Extended Description of Command-line options:
 
 -l/-log <path>		     This option turns on logging of actions in the algorithm. Format of output is given below.
 
+-n/-noflip <path>	     This options allows the specification of nodes which cannot be flipped. Path points to a list of node-labels to be 'locked'. Default is no locked nodes.
 ---------------
 
 Several things to note:
@@ -96,6 +97,9 @@ option("f", "foff") {
   on }
 option("l", "log") {
   description "Log flips and merges to file"
+  c_string; typestr "path"}
+option("n", "noflip"){
+  description "Takes in a list of nodes not to flip"
   c_string; typestr "path"}
 # option("w", "weight") {
 #   description "Weighting for column 5 and 6"

@@ -80,3 +80,20 @@ void readdata(master_list_type& master_edge, node_map_type& master_node, bool fi
     }
   }
 }
+
+//Cycles through input file and master node-list to set bool 'flippable' to false
+void locknodes(node_map_type& master_node, std::istream& input){
+  std::string node1; //holds the node identifer to find
+  node_map_type::iterator indx;
+
+  //go through list and set them.
+  while(input.good()){
+    input>>node1;
+    
+    if(!input.good())
+      break;
+
+    indx=master_node.find(node1);
+    indx->second.flippable=false;
+  }
+}

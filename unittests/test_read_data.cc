@@ -114,4 +114,54 @@ TEST(ReadData, Small) {
     ASSERT_EQ(edge_it, edges.end());
   }
 }
+
+
+TEST(ReadData, lock) {
+  const std::string content("0 1 7 0 0 0\n" // 7
+                            "1 2 4 0 0 0\n" // 4
+                            "1 3 0 6 0 0\n" // 6
+                            "1 4 1 8 0 0\n" // 8
+                            "2 3 1 0 0 0\n"
+                            "3 4 5 1 0 0\n" // 5
+                            "4 2 0 1 0 0\n"
+                            "5 6 2 0 0 0\n" // 1 / 5
+                            "6 5 0 3 0 0\n"); // duplicate);
+
+  std::istringstream input(content);
+  ASSERT_TRUE(input.good());
+  master_list_type master_edge;
+  node_map_type master_node;
+  readdata(master_edge, master_node, true, input);
+
+
+  const std::string content2("2\n"
+			     "4\n"
+			     "6\n");
+
+  std::istringstream input2(content2);
+  ASSERT_TRUE(input2.good());
+
+  locknodes(master_node,input2);
+
+  node_map_type::iterator it;
+
+  it=master_node.find("1");
+  EXPECT_TRUE(it->second.flippable);
+
+  it=master_node.find("2");
+  EXPECT_FALSE(it->second.flippable);
+
+  it=master_node.find("3");
+  EXPECT_TRUE(it->second.flippable);
+
+  it=master_node.find("4");
+  EXPECT_FALSE(it->second.flippable);
+
+  it=master_node.find("5");
+  EXPECT_TRUE(it->second.flippable);
+
+  it=master_node.find("6");
+  EXPECT_FALSE(it->second.flippable);
+}
+
 }

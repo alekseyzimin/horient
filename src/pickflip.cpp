@@ -48,6 +48,14 @@ node& pick_flip(const edge_ptr& join_edge){
   int n2_good = 0;
   int n2_bad  = 0;
 
+  //Check flippable, if both are not flippable, return flippable one.
+  if(! (join_edge->n1.flippable && join_edge->n2.flippable) ){
+    if(join_edge->n1.flippable)
+      return join_edge->n1;
+    else
+      return join_edge->n2;
+  }
+
   // Sum up good and bad mate-pairs for all edges incident to Node 1
   // in edge(join_edge)
 
