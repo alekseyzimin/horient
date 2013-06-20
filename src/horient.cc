@@ -135,8 +135,9 @@ int main(int argc, char *argv[])
     if(args.component_flag) {
       for(auto it = stats.components.cbegin(); it != stats.components.cend(); ++it) {
         file << "Component good: " << it->first->int_good << " bad: " << it->first->int_bad << " elements:";
-        for(auto it2 = it->second.cbegin(); it2 != it->second.cend(); ++it2) {
-          file << " " << it2->first << "(" << (it2->second->orient == 1 ? "+" : "-") << ")";
+        for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+          file << " " << it2->first << "(" << (it2->second->resolve_orientation() == 1 ? "+" : "-") << ")";
+	  //replaced it2->second->orient w/ resolve_orientation()...error in resolve?
         }
         file << "\n";
       }
